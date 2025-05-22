@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Antecipação Minimalista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #001A3B;
+            --primary-highlight: #DD2973; /* Usar com extrema moderação */
+            --primary-highlight-darker: #b81e5f;
+            --primary-highlight-shadow: rgba(221, 41, 115, 0.25);
+            --primary-dark-shadow: rgba(0, 26, 59, 0.1);
+
+            --text-light: #f8fafc;
+            --text-primary: #001A3B;
+            --text-secondary: #52657d;
+            
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --border-dark: #a0aec0; 
+
+            --background-body: linear-gradient(135deg, #f6f9fc 0%, #e9eff5 100%);
+            --background-container: white;
+            --background-input-area: #f8faff; 
+            --background-option-hover: #f0f4f8;
+            
+            --warning-bg: linear-gradient(135deg, #fffaf0 0%, #fff3e0 100%);
+            --warning-border: #fab363;
+            --warning-text: #b55900;
+            --warning-icon: #fab363;
+            --font-main: 'Montserrat', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+
+        body {
+            background: var(--background-body); color: var(--text-primary); padding: 20px;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+
+        .container {
+            max-width: 900px; width: 100%; margin: 20px auto; background: var(--background-container);
+            border-radius: 24px; box-shadow: 0 25px 70px rgba(0, 26, 59, 0.12);
+            padding: 40px; position: relative; overflow: hidden;
+        }
+        .container::before { /* Linha superior sólida com a cor escura principal */
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+            background: var(--primary-dark);
+        }
+
+        .progress-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 45px; position: relative; padding: 0 10px; }
+        .progress-line { position: absolute; height: 4px; background: var(--border-light); width: calc(100% - 70px); border-radius: 2px; z-index: 1; left: 35px; top: 50%; transform: translateY(-50%); }
+        .progress-line-filled { /* Linha de progresso sólida com a cor escura principal */
+            position: absolute; height: 4px; background: var(--primary-dark); border-radius: 2px;
+            z-index: 2; transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1); left: 35px;
+            top: 50%; transform: translateY(-50%); width: 0%;
+        }
+        .progress-step {
+            width: 38px; height: 38px; border-radius: 50%; background: var(--background-container);
+            border: 3px solid var(--border-medium); z-index: 3; position: relative; display: flex;
+            align-items: center; justify-content: center; font-weight: 600; font-size: 15px;
+            color: var(--text-secondary); transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .progress-step.active { border-color: var(--primary-dark); color: var(--primary-dark); transform: scale(1.15); box-shadow: 0 6px 25px var(--primary-dark-shadow); }
+        .progress-step.completed { /* Step completado com fundo escuro e check branco */
+            background: var(--primary-dark); border-color: var(--primary-dark);
+            color: var(--text-light); /* Checkmark branco */
+            transform: scale(1.1);
+        }
+        .progress-step.completed::before { content: "✓"; font-size: 18px; font-weight: 700; position: absolute; }
+        .progress-step.completed .step-number { display: none; }
+
+        .step-container { display: none; opacity: 0; transform: translateY(25px); transition: opacity 0.6s cubic-bezier(0.65, 0, 0.35, 1), transform 0.6s cubic-bezier(0.65, 0, 0.35, 1); }
+        .step-container.active { display: block; opacity: 1; transform: translateY(0); }
+
+        h1 { font-size: 32px; font-weight: 700; margin-bottom: 16px; color: var(--primary-dark); line-height: 1.35; letter-spacing: -0.5px; }
+        p { color: var(--text-secondary); margin-bottom: 36px; font-size: 17px; line-height: 1.65; font-weight: 400; }
+
+        .maturity-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 16px; margin-bottom: 40px; }
+        .maturity-option {
+            height: 70px; border: 2px solid var(--border-light); border-radius: 16px; display: flex;
+            align-items: center; justify-content: center; cursor: pointer; font-size: 19px;
+            font-weight: 600; color: var(--text-secondary); transition: all 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+            background: var(--background-container); position: relative;
+        }
+        .maturity-option:hover:not(.selected) { border-color: var(--border-dark); color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 26, 59, 0.08); }
+        .maturity-option.selected { border-color: var(--primary-dark); color: var(--text-light); background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 8px 25px var(--primary-dark-shadow); }
+        .maturity-option.selected:hover { background: var(--primary-dark); }
+
+        .input-group { margin-bottom: 30px; }
+        .input-group label:not(.checkbox-label):not(.radio-label), .input-group-label-legend { display: block; margin-bottom: 12px; color: var(--primary-dark); font-weight: 600; font-size: 17px; letter-spacing: 0.2px; }
+        .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select {
+            width: 100%; padding: 18px 22px; border: 2px solid var(--border-light); border-radius: 16px;
+            font-size: 16px; color: var(--primary-dark); transition: all 0.25s cubic-bezier(0.65, 0, 0.35, 1);
+            background: var(--background-container); font-weight: 500;
+        }
+        .input-group input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+        .input-group input[type="text"]:focus, .input-group input[type="email"]:focus, .input-group input[type="tel"]:focus, .input-group select:focus {
+            outline: none; border-color: var(--primary-dark); box-shadow: 0 0 0 4px var(--primary-dark-shadow);
+            transform: translateY(-1px);
+        }
+        .input-group input[type="text"]:hover:not(:focus), .input-group input[type="email"]:hover:not(:focus), .input-group input[type="tel"]:hover:not(:focus), .input-group select:hover:not(:focus) { border-color: var(--border-dark); }
+        .input-group input:invalid:not(:placeholder-shown):not(:focus) { border-color: #ef4444; }
+        .input-group input:invalid:not(:placeholder-shown):focus { border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15); }
+
+        .value-input {
+            position: relative; margin-bottom: 40px; background: var(--background-input-area);
+            border-radius: 18px; padding: 24px 28px; /* Ajustado padding vertical */
+            border: 2px solid transparent; transition: all 0.25s ease;
+        }
+        .value-input:focus-within { border-color: var(--primary-dark); box-shadow: 0 0 0 4px var(--primary-dark-shadow); }
+        .value-input label { margin-bottom: 14px; color: var(--primary-dark); font-weight: 600; font-size: 19px; display: block; }
+        .value-prefix {
+            position: absolute; left: 28px;
+            bottom: 25px; /* Ajuste fino para baseline com o input */
+            line-height: 1; /* Reset para controle mais preciso */
+            color: var(--text-secondary); font-size: 30px;
+            font-weight: 600; pointer-events: none;
+        }
+        .value-input input {
+            width: 100%; padding: 8px 0px 8px 60px; /* Ajustado padding vertical e esquerdo */
+            border: none; border-bottom: 3px solid var(--border-medium); font-size: 38px; font-weight: 700;
+            color: var(--primary-dark); background: transparent; transition: border-color 0.25s ease;
+            line-height: 1.3; /* Ajuste para melhor encaixe vertical e alinhamento */
+            height: auto; 
+        }
+        .value-input input::placeholder { color: var(--border-medium); }
+        .value-input input:focus { outline: none; border-bottom-color: var(--primary-dark); }
+
+        .alert-box {
+            background: var(--warning-bg); border-radius: 16px; padding: 20px 22px; /* Ajustado padding vertical */
+            margin-left: 0; margin-right: 0; /* Garante que não haja margens laterais próprias */
+            margin-bottom: 40px;
+            display: flex; align-items: flex-start; border-left: 5px solid var(--warning-border);
+            position: relative; overflow: hidden; width: 100%; /* Garante que ocupe a largura do fluxo */
+        }
+        .alert-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--warning-border), #fdd8a4); }
+        .alert-icon { color: var(--warning-icon); font-size: 26px; margin-right: 18px; margin-top: 1px; }
+        .alert-text { color: var(--warning-text); font-size: 15.5px; line-height: 1.65; font-weight: 500; }
+        .alert-text strong { font-weight: 700; color: var(--primary-dark); }
+
+        .button-container { display: flex; justify-content: center; margin-top: 44px; }
+        .button {
+            padding: 20px 45px; background: linear-gradient(135deg, var(--primary-highlight) 0%, var(--primary-highlight-darker) 100%);
+            color: var(--text-light); border: none; border-radius: 50px; font-size: 18px; font-weight: 700;
+            cursor: pointer; transition: all 0.25s cubic-bezier(0.65, 0, 0.35, 1); position: relative;
+            overflow: hidden; letter-spacing: 0.75px; min-width: 220px; text-align: center;
+            box-shadow: 0 5px 15px var(--primary-highlight-shadow);
+        }
+        .button::before { content: ''; position: absolute; top: 0; left: -120%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent); transform: skewX(-25deg); transition: left 0.7s cubic-bezier(0.65, 0, 0.35, 1); }
+        .button:hover:not(:disabled) { background: linear-gradient(135deg, var(--primary-highlight-darker) 0%, var(--primary-highlight) 100%); transform: translateY(-3px) scale(1.02); box-shadow: 0 14px 40px var(--primary-highlight-shadow); }
+        .button:hover:not(:disabled)::before { left: 120%; }
+        .button:active:not(:disabled) { transform: translateY(0) scale(1); box-shadow: 0 5px 15px var(--primary-highlight-shadow); }
+        .button:disabled { background: var(--border-medium); color: var(--text-secondary); cursor: not-allowed; transform: none; box-shadow: none; }
+        .button:disabled::before { display: none; }
+
+        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+        .radio-option, .checkbox-option {
+            display: flex; align-items: center; padding: 16px; border-radius: 14px; cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            background-color: var(--background-input-area); border: 2px solid transparent;
+        }
+        .radio-option:hover, .checkbox-option:hover {
+            background-color: var(--background-option-hover);
+            border-color: var(--border-dark); /* Borda escura no hover */
+        }
+        .radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
+            width: 20px; height: 20px; margin-right: 14px; 
+            accent-color: var(--primary-dark); /* Cor escura para o preenchimento */
+            flex-shrink: 0; cursor: pointer; border: 2px solid var(--border-dark);
+            border-radius: 50%; appearance: none; display: grid; place-content: center;
+        }
+        .checkbox-option input[type="checkbox"] { border-radius: 4px; }
+        .radio-option input[type="radio"]::before, .checkbox-option input[type="checkbox"]::before {
+            content: ""; width: 10px; height: 10px; border-radius: 50%;
+            transform: scale(0); transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em var(--primary-dark); /* Cor escura no check interno */
+        }
+        .checkbox-option input[type="checkbox"]::before { border-radius: 0; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+        .radio-option input[type="radio"]:checked::before, .checkbox-option input[type="checkbox"]:checked::before { transform: scale(1); }
+        .radio-option input[type="radio"]:checked, .checkbox-option input[type="checkbox"]:checked {
+             border-color: var(--primary-dark); /* Borda escura quando checado */
+        }
+        .radio-option label.radio-label, .checkbox-option label.checkbox-label { font-weight: 500; cursor: pointer; color: var(--text-primary); flex-grow: 1; font-size: 16px; line-height: 1.5; }
+        .checkbox-option a { color: var(--primary-highlight); text-decoration: underline; font-weight: 600; }
+        .checkbox-option a:hover { color: var(--primary-highlight-darker); }
+
+        .result-container {
+            background: var(--background-input-area); padding: 36px; border-radius: 20px; margin-bottom: 40px;
+            border: 1px solid var(--border-light); position: relative; overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,26,59,0.03);
+        }
+        .result-container::before { /* Linha superior escura */
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+            background: var(--primary-dark);
+        }
+        .result-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding: 18px 0; border-bottom: 1px solid var(--border-light); }
+        .result-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .result-label { color: var(--text-secondary); font-weight: 500; font-size: 17px; }
+        .result-value { font-weight: 700; color: var(--primary-dark); font-size: 19px; }
+        .result-value.highlight { /* Destaque com cor escura e maior peso/tamanho */
+            color: var(--primary-dark); font-size: 36px; font-weight: 800;
+            /* text-shadow: 0 2px 8px var(--primary-dark-shadow); */ /* Sombra opcional */
+        }
+
+        .button.loading { pointer-events: none; }
+        .button.loading .button-text { visibility: hidden; }
+        .button.loading::after { content: ''; position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: var(--text-light); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container { padding: 30px; margin: 15px; border-radius: 18px; }
+            h1 { font-size: 28px; }
+            p { font-size: 16px; }
+            .maturity-options { grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); }
+            .maturity-option { height: 65px; font-size: 18px; }
+            .value-input { padding: 20px 24px; }
+            .value-input label {margin-bottom: 10px;}
+            .value-input input { font-size: 30px; padding: 6px 0px 6px 50px; line-height: 1.3; }
+            .value-prefix { font-size: 26px; left: 24px; bottom: 21px; }
+
+            .progress-step { width: 32px; height: 32px; font-size: 14px; }
+            .progress-line { width: calc(100% - 60px); left: 30px; }
+            .progress-line-filled { left: 30px; }
+            .button { padding: 18px 35px; font-size: 17px; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 20px; } /* Menor padding geral */
+            h1 { font-size: 24px; }
+            p { font-size: 15px; }
+            .maturity-options { grid-template-columns: repeat(2, 1fr); }
+            .radio-option, .checkbox-option { padding: 12px; } /* Menor padding nas opções */
+            .radio-option input[type="radio"], .checkbox-option input[type="checkbox"] { margin-right: 10px;}
+            .radio-label, .checkbox-label { font-size: 14px; } /* Label menor */
+            .result-row { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 0; }
+            .result-value.highlight { font-size: 26px; }
+            .button { padding: 15px 25px; font-size: 16px; min-width: 100%; }
+            .value-input { padding: 18px 20px; }
+            .value-input input { font-size: 24px; padding: 4px 0px 4px 45px; line-height: 1.3; }
+            .value-prefix { font-size: 20px; left: 20px; bottom: 18px; }
+            .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
+        }
+
+        :focus-visible { outline: 3px solid var(--primary-highlight); outline-offset: 3px; }
+        :focus:not(:focus-visible) { outline: none; }
+        .maturity-option:focus-visible, .radio-option:focus-visible, .checkbox-option:focus-visible { position: relative; z-index: 10; box-shadow: 0 0 0 2px var(--background-container), 0 0 0 4px var(--primary-highlight) !important; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress-step active" id="step1-indicator"><span class="step-number">1</span></div>
+            <div class="progress-line"></div>
+            <div class="progress-line-filled" id="progress-filled"></div>
+            <div class="progress-step" id="step2-indicator"><span class="step-number">2</span></div>
+            <div class="progress-step" id="step3-indicator"><span class="step-number">3</span></div>
+        </div>
+
+        <div class="step-container active" id="step1">
+            <h1>Simule sua Antecipação Instantaneamente</h1>
+            <p>Defina o prazo de vencimento e o valor desejado para visualizar os cenários de antecipação.</p>
+            <div class="input-group">
+                <label for="maturity-options-id">Vencimento até (em dias)</label>
+                <div class="maturity-options" id="maturity-options-id" role="group" aria-labelledby="maturity-options-id">
+                    <div class="maturity-option" data-days="15" tabindex="0" role="button">15</div>
+                    <div class="maturity-option" data-days="30" tabindex="0" role="button">30</div>
+                    <div class="maturity-option" data-days="45" tabindex="0" role="button">45</div>
+                    <div class="maturity-option" data-days="60" tabindex="0" role="button">60</div>
+                    <div class="maturity-option" data-days="90" tabindex="0" role="button">90</div>
+                    <div class="maturity-option" data-days="95" tabindex="0" role="button">95</div>
+                </div>
+            </div>
+            <div class="value-input">
+                <label for="amount-input">Valor que deseja antecipar</label>
+                <span class="value-prefix">R$</span>
+                <input type="text" id="amount-input" placeholder="0,00" inputmode="decimal">
+            </div>
+            <div class="alert-box" role="alert">
+                <div class="alert-icon" aria-hidden="true">⚠️</div>
+                <div class="alert-text">
+                    <strong>Importante:</strong> O valor exibido é uma simulação com base na menor taxa de juros atual. Condições finais podem variar conforme a análise dos financiadores.
+                </div>
+            </div>
+            <div class="button-container">
+                <button class="button" id="step1-button" disabled><span class="button-text">Simular Gratuitamente</span></button>
+            </div>
+        </div>
+
+        <div class="step-container" id="step2">
+            <h1>Complete seu Cadastro</h1>
+            <p>Estamos quase lá! Precisamos de algumas informações para prosseguir com sua simulação personalizada.</p>
+            <div class="alert-box" role="alert">
+                <div class="alert-icon" aria-hidden="true">⚠️</div>
+                <div class="alert-text">
+                    <strong>Atenção:</strong> Operamos exclusivamente com duplicatas, contratos de serviço e faturas B2B. Não atendemos pessoas físicas ou transações com consumidor final (B2C).
+                </div>
+            </div>
+            <form id="registration-form" novalidate>
+                <div class="input-group">
+                    <label for="email-input">E-mail Corporativo*</label>
+                    <input type="email" id="email-input" placeholder="ex: seu.nome@empresa.com.br" required>
+                </div>
+                <div class="input-group">
+                    <label for="name-input">Nome Completo*</label>
+                    <input type="text" id="name-input" placeholder="Seu nome como consta no RG" required>
+                </div>
+                <div class="input-group">
+                    <label for="phone-input">Telefone Celular* (com DDD)</label>
+                    <input type="tel" id="phone-input" placeholder="(XX) 9XXXX-XXXX" required>
+                </div>
+                <div class="input-group">
+                    <label for="company-name-input">Nome da Empresa (Razão Social)*</label>
+                    <input type="text" id="company-name-input" placeholder="Nome completo da sua empresa" required>
+                </div>
+                <div class="input-group">
+                    <label for="cnpj-input">CNPJ da Empresa*</label>
+                    <input type="text" id="cnpj-input" placeholder="00.000.000/0000-00" required>
+                </div>
+
+                <fieldset class="input-group" aria-labelledby="years-operation-label">
+                    <legend id="years-operation-label" class="input-group-label-legend">Há quantos anos sua empresa está em operação?*</legend>
+                     <div class="radio-group">
+                        <div class="radio-option" tabindex="0">
+                            <input type="radio" id="years-less-2" name="years-operation" value="menos-2" required>
+                            <label for="years-less-2" class="radio-label">Menos de 2 anos</label>
+                        </div>
+                        <div class="radio-option" tabindex="0">
+                            <input type="radio" id="years-more-2" name="years-operation" value="mais-2" required>
+                            <label for="years-more-2" class="radio-label">Mais de 2 anos</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="input-group" aria-labelledby="monthly-revenue-label">
+                    <legend id="monthly-revenue-label" class="input-group-label-legend">Qual seu faturamento mensal?*</legend>
+                    <div class="radio-group">
+                        <div class="radio-option" tabindex="0">
+                            <input type="radio" id="revenue-below" name="monthly-revenue" value="abaixo-300mil" required>
+                            <label for="revenue-below" class="radio-label">Abaixo de R$300 mil</label>
+                        </div>
+                        <div class="radio-option" tabindex="0">
+                            <input type="radio" id="revenue-above" name="monthly-revenue" value="acima-300mil" required>
+                            <label for="revenue-above" class="radio-label">Acima de R$300 mil</label>
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="input-group" aria-labelledby="consent-label">
+                    <legend id="consent-label" class="input-group-label-legend">Consentimentos Obrigatórios*</legend>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option" tabindex="0">
+                            <input type="checkbox" id="consent-1" name="consent" required>
+                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="#politica-privacidade" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</label>
+                        </div>
+                        <div class="checkbox-option" tabindex="0">
+                            <input type="checkbox" id="consent-2" name="consent" required>
+                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <a href="#politica-autorizacao-scr" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.</label>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <div class="button-container">
+                <button class="button" id="step2-button" disabled><span class="button-text">Ver Resultado da Simulação</span></button>
+            </div>
+        </div>
+
+        <div class="step-container" id="step3">
+            <h1>Resultado da Simulação de Antecipação</h1>
+            <p>Confira abaixo os detalhes da sua simulação. Este é um valor estimado.</p>
+            <div class="result-container" aria-live="polite">
+                <div class="result-row">
+                    <div class="result-label">Valor Solicitado para Antecipação</div>
+                    <div class="result-value" id="result-total">R$ 0,00</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Prazo de Vencimento Considerado</div>
+                    <div class="result-value" id="result-days">0 dias</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Taxa de Antecipação Estimada</div>
+                    <div class="result-value" id="result-rate">A partir de 1,98% a.m.</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Valor Estimado a Receber*</div>
+                    <div class="result-value highlight" id="result-amount">R$ 0,00</div>
+                </div>
+            </div>
+             <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
+            <div class="button-container">
+                <button class="button" id="step3-button"><span class="button-text">Solicitar Proposta Oficial</span></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript permanece o mesmo da versão anterior.
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = {
+                progressFilled: document.getElementById('progress-filled'),
+                stepIndicators: {1: document.getElementById('step1-indicator'), 2: document.getElementById('step2-indicator'), 3: document.getElementById('step3-indicator')},
+                stepContainers: {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3')},
+                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button'), step3: document.getElementById('step3-button')},
+                step1: {amountInput: document.getElementById('amount-input'), maturityOptions: document.querySelectorAll('.maturity-option')},
+                step2: {
+                    registrationForm: document.getElementById('registration-form'), emailInput: document.getElementById('email-input'),
+                    nameInput: document.getElementById('name-input'), phoneInput: document.getElementById('phone-input'),
+                    companyNameInput: document.getElementById('company-name-input'), cnpjInput: document.getElementById('cnpj-input'),
+                    yearsOperationRadios: document.querySelectorAll('input[name="years-operation"]'),
+                    monthlyRevenueRadios: document.querySelectorAll('input[name="monthly-revenue"]'),
+                    consentCheckboxes: [document.getElementById('consent-1'), document.getElementById('consent-2')],
+                },
+                step3: {resultTotal: document.getElementById('result-total'), resultDays: document.getElementById('result-days'), resultAmount: document.getElementById('result-amount')}
+            };
+
+            let currentStep = 1;
+            let simulationData = {selectedDays: 0, enteredAmount: 0, calculatedFinalAmount: 0};
+
+            const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            function updateProgressBar() {
+                const totalSteps = Object.keys(elements.stepIndicators).length;
+                const progressPercentage = totalSteps > 1 ? ((currentStep - 1) / (totalSteps - 1)) * 100 : 0;
+                elements.progressFilled.style.width = `${progressPercentage}%`;
+                for (let i = 1; i <= totalSteps; i++) {
+                    const indicator = elements.stepIndicators[i];
+                    indicator.classList.remove('active', 'completed');
+                    if (i < currentStep) indicator.classList.add('completed');
+                    else if (i === currentStep) indicator.classList.add('active');
+                }
+            }
+
+            function showStep(stepNumber) {
+                Object.values(elements.stepContainers).forEach(container => container.classList.remove('active'));
+                elements.stepContainers[stepNumber].classList.add('active');
+                currentStep = stepNumber;
+                updateProgressBar();
+                elements.stepContainers[stepNumber].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            function applyPhoneMask(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.substring(0, 11);
+                let maskedValue = '';
+                if (value.length > 0) maskedValue = `(${value.substring(0, 2)}`;
+                if (value.length > 2) {
+                    const numberPart = value.substring(2);
+                    if (numberPart.length <= 5) maskedValue += `) ${numberPart}`;
+                    else maskedValue += `) ${numberPart.substring(0, numberPart.length - 4)}-${numberPart.substring(numberPart.length - 4)}`;
+                }
+                e.target.value = maskedValue.trim();
+            }
+
+            function applyCnpjMask(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.substring(0, 14);
+                if (value.length > 12) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5, 8)}/${value.substring(8, 12)}-${value.substring(12)}`;
+                else if (value.length > 8) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5, 8)}/${value.substring(8)}`;
+                else if (value.length > 5) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5)}`;
+                else if (value.length > 2) value = `${value.substring(0, 2)}.${value.substring(2)}`;
+                e.target.value = value;
+            }
+
+            function validateStep1() {
+                const { selectedDays, enteredAmount } = simulationData;
+                if (selectedDays > 0 && enteredAmount > 0) {
+                    elements.buttons.step1.disabled = false;
+                    const baseRate = 0.0198;
+                    const daysFactor = selectedDays / 30;
+                    const adjustedRate = baseRate * daysFactor;
+                    simulationData.calculatedFinalAmount = enteredAmount - (enteredAmount * adjustedRate);
+                } else {
+                    elements.buttons.step1.disabled = true;
+                }
+            }
+
+            function validateStep2() {
+                const { emailInput, nameInput, phoneInput, companyNameInput, cnpjInput, consentCheckboxes } = elements.step2;
+                const isEmailValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+                const isNameValid = nameInput.checkValidity() && nameInput.value.trim() !== '';
+                const isPhoneValid = phoneInput.checkValidity() && phoneInput.value.replace(/\D/g, '').length >= 10;
+                const isCompanyNameValid = companyNameInput.checkValidity() && companyNameInput.value.trim() !== '';
+                const isCnpjValid = cnpjInput.checkValidity() && cnpjInput.value.replace(/\D/g, '').length === 14;
+                const isYearsOperationSelected = !!document.querySelector('input[name="years-operation"]:checked');
+                const isMonthlyRevenueSelected = !!document.querySelector('input[name="monthly-revenue"]:checked');
+                const areConsentsChecked = consentCheckboxes.every(cb => cb.checked);
+                elements.buttons.step2.disabled = !(isEmailValid && isNameValid && isPhoneValid && isCompanyNameValid && isCnpjValid && isYearsOperationSelected && isMonthlyRevenueSelected && areConsentsChecked);
+            }
+
+            elements.step1.amountInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                simulationData.enteredAmount = value ? parseInt(value, 10) / 100 : 0;
+                e.target.value = value ? formatCurrency(simulationData.enteredAmount) : '';
+                validateStep1();
+            });
+
+            elements.step1.maturityOptions.forEach(option => {
+                const handleSelection = () => {
+                    elements.step1.maturityOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    simulationData.selectedDays = parseInt(option.getAttribute('data-days'), 10);
+                    validateStep1();
+                };
+                option.addEventListener('click', handleSelection);
+                option.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelection.call(option); } });
+            });
+
+            elements.buttons.step1.addEventListener('click', () => {
+                if (!elements.buttons.step1.disabled) {
+                    elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
+                    elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
+                    elements.step3.resultAmount.textContent = "R$ " + formatCurrency(simulationData.calculatedFinalAmount);
+                    showStep(2);
+                }
+            });
+            
+            [elements.step2.emailInput, elements.step2.nameInput, elements.step2.phoneInput, elements.step2.companyNameInput, elements.step2.cnpjInput].forEach(input => {
+                input.addEventListener('input', validateStep2); input.addEventListener('blur', validateStep2);
+            });
+            elements.step2.phoneInput.addEventListener('input', applyPhoneMask);
+            elements.step2.cnpjInput.addEventListener('input', applyCnpjMask);
+
+            [...elements.step2.yearsOperationRadios, ...elements.step2.monthlyRevenueRadios, ...elements.step2.consentCheckboxes].forEach(input => {
+                input.addEventListener('change', validateStep2);
+            });
+            
+            document.querySelectorAll('.radio-option, .checkbox-option').forEach(wrapper => {
+                wrapper.addEventListener('click', (e) => {
+                    const input = wrapper.querySelector('input[type="radio"], input[type="checkbox"]');
+                    if (input && e.target !== input && e.target.tagName !== 'A' && e.target.tagName !== 'LABEL') { 
+                        if (input.type === 'radio' && !input.checked) {
+                            input.checked = true;
+                        } else if (input.type === 'checkbox') {
+                            input.checked = !input.checked;
+                        }
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                 wrapper.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const input = wrapper.querySelector('input[type="radio"], input[type="checkbox"]');
+                        if(input) {
+                            if (input.type === 'radio') input.checked = true;
+                            else input.checked = !input.checked;
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                });
+            });
+
+            elements.buttons.step2.addEventListener('click', () => {
+                validateStep2(); 
+                if (!elements.buttons.step2.disabled) showStep(3);
+                else {
+                    elements.step2.registrationForm.reportValidity(); 
+                    const firstInvalid = elements.step2.registrationForm.querySelector(':invalid');
+                    firstInvalid?.focus();
+                }
+            });
+
+            elements.buttons.step3.addEventListener('click', () => {
+                const btn = elements.buttons.step3;
+                btn.classList.add('loading'); btn.disabled = true;
+                setTimeout(() => {
+                    btn.classList.remove('loading'); btn.disabled = false;
+                    const formData = {
+                        simulation: simulationData,
+                        registration: {
+                            email: elements.step2.emailInput.value, name: elements.step2.nameInput.value,
+                            phone: elements.step2.phoneInput.value, companyName: elements.step2.companyNameInput.value,
+                            cnpj: elements.step2.cnpjInput.value,
+                            yearsOperation: document.querySelector('input[name="years-operation"]:checked')?.value,
+                            monthlyRevenue: document.querySelector('input[name="monthly-revenue"]:checked')?.value,
+                            consents: {dataProcessing: elements.step2.consentCheckboxes[0].checked, scrAuthorization: elements.step2.consentCheckboxes[1].checked}
+                        }
+                    };
+                    console.log('Dados Finais da Solicitação:', formData);
+                    alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)');
+                }, 2500);
+            });
+
+            updateProgressBar(); validateStep1(); validateStep2();
+        });
+    </script>
+</body>
+</html>
