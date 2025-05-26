@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Alinhado ao Topo (Final)</title>
+    <title>Simulador de Antecipação - Ajustes Finais</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,10 +21,10 @@
             --border-medium: #cbd5e1; 
             --border-dark: #a0aec0; 
 
-            --background-body-html: #ffffff; /* Fundo branco para o HTML/BODY do seu bloco */
+            --background-body-html: #f3f3f3; /* Alterado para #f3f3f3 */
             --background-container: #ffffff; 
-            --background-input-area: #f8faff; 
-            --background-option-hover: #f0f4f8;
+            --background-input-area: #f8faff; /* Pode ajustar para #f3f3f3 se quiser o mesmo fundo do body */
+            --background-option-hover: #e9e9e9; /* Ajustado para melhor contraste com #f3f3f3 */
             
             --warning-bg: linear-gradient(135deg, #fffaf0 0%, #fff3e0 100%);
             --warning-border: #fab363;
@@ -38,21 +38,20 @@
         body { /* Body do SEU bloco HTML */
             background: var(--background-body-html); 
             color: var(--text-primary); 
-            margin: 0; /* Sem margens */
-            padding: 0; /* Sem paddings */
-            /* Todos os estilos de flex e min-height removidos */
+            margin: 0; 
+            padding: 20px; /* Adiciona 20px de padding em todos os lados, incluindo o topo */
         }
 
-        /* A regra .page-title foi removida pois o elemento HTML foi removido */
+        /* A regra .page-title foi removida */
 
         .container {
             max-width: 900px; 
             width: 100%; 
-            margin: 0 auto 20px auto; /* Topo 0, Laterais auto (para centralizar se a caixa do GP for maior), Base 20px */
+            margin: 0 auto 20px auto; /* Topo 0 (o padding do body faz o espaçamento), Laterais auto, Base 20px */
             background: var(--background-container); 
             border-radius: 16px; 
-            border: 1px solid var(--border-medium); 
-            box-shadow: none; 
+            /* border: 1px solid var(--border-medium); Removida borda para usar apenas sombra */
+            box-shadow: 0 10px 30px rgba(0, 26, 59, 0.08); /* Sombra restaurada e sutil */
             padding: 40px; 
             position: relative; 
             overflow: hidden;
@@ -92,7 +91,7 @@
         .step-container { display: none; opacity: 0; transform: translateY(25px); transition: opacity 0.6s cubic-bezier(0.65, 0, 0.35, 1), transform 0.6s cubic-bezier(0.65, 0, 0.35, 1); }
         .step-container.active { display: block; opacity: 1; transform: translateY(0); }
 
-        h1 { /* Este H1 é o título DENTRO do formulário (Simule sua Antecipação Instantaneamente) */
+        h1 { 
             font-size: 32px; font-weight: 700; margin-bottom: 16px; 
             color: var(--primary-dark); line-height: 1.35; letter-spacing: -0.5px; 
         }
@@ -230,8 +229,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (max-width: 768px) {
-            /* body { padding: 15px; } */ /* Padding do body já é 0 no topo */
-            /* .page-title removido */
+            body { padding: 20px 15px; } /* Padding geral, incluindo topo */
             .container { padding: 30px; margin: 0 auto 15px auto; border-radius: 18px; } 
             h1 { font-size: 26px; } 
             p { font-size: 16px; }
@@ -248,8 +246,7 @@
             .button { padding: 18px 35px; font-size: 17px; }
         }
         @media (max-width: 480px) {
-            /* body { padding: 10px; } */ /* Padding do body já é 0 no topo */
-            /* .page-title removido */
+            body { padding: 20px 10px; }
             .container { padding: 20px; margin: 0 auto 10px auto; } 
             h1 { font-size: 22px; } 
             p { font-size: 15px; }
