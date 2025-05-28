@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais</title>
+    <title>Simulador de Antecipação - Fórmula Atualizada</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,10 +21,10 @@
             --border-medium: #cbd5e1; 
             --border-dark: #a0aec0; 
 
-            --background-body-html: #f3f3f3; /* Alterado para #f3f3f3 */
+            --background-body-html: #f3f3f3; 
             --background-container: #ffffff; 
-            --background-input-area: #f8faff; /* Pode ajustar para #f3f3f3 se quiser o mesmo fundo do body */
-            --background-option-hover: #e9e9e9; /* Ajustado para melhor contraste com #f3f3f3 */
+            --background-input-area: #f8faff; 
+            --background-option-hover: #e9e9e9; 
             
             --warning-bg: linear-gradient(135deg, #fffaf0 0%, #fff3e0 100%);
             --warning-border: #fab363;
@@ -35,23 +35,20 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
-        body { /* Body do SEU bloco HTML */
+        body { 
             background: var(--background-body-html); 
             color: var(--text-primary); 
             margin: 0; 
-            padding: 20px; /* Adiciona 20px de padding em todos os lados, incluindo o topo */
+            padding: 20px; 
         }
-
-        /* A regra .page-title foi removida */
 
         .container {
             max-width: 900px; 
             width: 100%; 
-            margin: 0 auto 20px auto; /* Topo 0 (o padding do body faz o espaçamento), Laterais auto, Base 20px */
+            margin: 0 auto 20px auto; 
             background: var(--background-container); 
             border-radius: 16px; 
-            /* border: 1px solid var(--border-medium); Removida borda para usar apenas sombra */
-            box-shadow: 0 10px 30px rgba(0, 26, 59, 0.08); /* Sombra restaurada e sutil */
+            box-shadow: 0 10px 30px rgba(0, 26, 59, 0.08); 
             padding: 40px; 
             position: relative; 
             overflow: hidden;
@@ -229,7 +226,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (max-width: 768px) {
-            body { padding: 20px 15px; } /* Padding geral, incluindo topo */
+            body { padding: 20px 15px; } 
             .container { padding: 30px; margin: 0 auto 15px auto; border-radius: 18px; } 
             h1 { font-size: 26px; } 
             p { font-size: 16px; }
@@ -280,7 +277,8 @@
         </div>
 
         <div class="step-container active" id="step1">
-            <h1>Simule sua Antecipação Instantaneamente</h1> <p>Defina o prazo de vencimento e o valor desejado para visualizar os cenários de antecipação.</p>
+            <h1>Simule sua Antecipação Instantaneamente</h1>
+            <p>Defina o prazo de vencimento e o valor desejado para visualizar os cenários de antecipação.</p>
             <div class="input-group">
                 <label for="maturity-options-id">Vencimento até (em dias)</label>
                 <div class="maturity-options" id="maturity-options-id" role="group" aria-labelledby="maturity-options-id">
@@ -310,7 +308,7 @@
 
         <div class="step-container" id="step2">
             <h1>Complete seu Cadastro</h1>
-            <p>Estamos quase lá! Precisamos de algumas informações para prosseguir com sua simulação personalizada.</p>
+             <p>Estamos quase lá! Precisamos de algumas informações para prosseguir com sua simulação personalizada.</p>
             <div class="alert-box" role="alert">
                 <div class="alert-icon" aria-hidden="true">⚠️</div>
                 <div class="alert-text">
@@ -415,7 +413,6 @@
     </div>
 
     <script>
-        // JavaScript permanece o mesmo da versão anterior.
         document.addEventListener('DOMContentLoaded', () => {
             const elements = {
                 progressFilled: document.getElementById('progress-filled'),
@@ -486,13 +483,24 @@
                 const { selectedDays, enteredAmount } = simulationData;
                 if (selectedDays > 0 && enteredAmount > 0) {
                     elements.buttons.step1.disabled = false;
-                    const baseRate = 0.0198;
-                    const daysFactor = selectedDays / 30;
-                    const adjustedRate = baseRate * daysFactor;
-                    simulationData.calculatedFinalAmount = enteredAmount - (enteredAmount * adjustedRate);
+                    
+                    // Fórmula Atualizada: Valor Cedido = Valor da Duplicata / ( (1 + Taxa Mensal) ^ (Prazo em Dias / 30) )
+                    const baseRate = 0.0198; // 1.98% a.m.
+                    const termInMonths = selectedDays / 30;
+                    
+                    if (termInMonths > 0 && (1 + baseRate) > 0) { // Evitar divisão por zero ou base inválida para potência
+                        simulationData.calculatedFinalAmount = enteredAmount / Math.pow((1 + baseRate), termInMonths);
+                    } else if (termInMonths === 0) { // Se prazo é 0, valor cedido é o próprio valor
+                        simulationData.calculatedFinalAmount = enteredAmount;
+                    } else { // Caso de erro ou valores inválidos
+                        simulationData.calculatedFinalAmount = 0; 
+                    }
+
                 } else {
                     elements.buttons.step1.disabled = true;
+                    simulationData.calculatedFinalAmount = 0; // Reseta se os inputs não são válidos
                 }
+                // Atualiza o display do resultado preliminar (se necessário em algum lugar, mas já é feito ao avançar)
             }
 
             function validateStep2() {
@@ -527,6 +535,7 @@
             });
 
             elements.buttons.step1.addEventListener('click', () => {
+                validateStep1(); // Garante que o cálculo está atualizado antes de mostrar
                 if (!elements.buttons.step1.disabled) {
                     elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
                     elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
