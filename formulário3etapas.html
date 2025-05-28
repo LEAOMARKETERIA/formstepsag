@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Fórmula Exata (Final)</title>
+    <title>Simulador de Antecipação - Taxa 5% Aplicada</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -398,8 +398,7 @@
                 </div>
                 <div class="result-row">
                     <div class="result-label">Taxa de Antecipação Estimada</div>
-                    <div class="result-value" id="result-rate">A partir de 1,98% a.m.</div>
-                </div>
+                    <div class="result-value" id="result-rate">A partir de 5,00% a.m.</div> </div>
                 <div class="result-row">
                     <div class="result-label">Valor Estimado a Receber*</div>
                     <div class="result-value highlight" id="result-amount">R$ 0,00</div>
@@ -428,11 +427,17 @@
                     monthlyRevenueRadios: document.querySelectorAll('input[name="monthly-revenue"]'),
                     consentCheckboxes: [document.getElementById('consent-1'), document.getElementById('consent-2')],
                 },
-                step3: {resultTotal: document.getElementById('result-total'), resultDays: document.getElementById('result-days'), resultAmount: document.getElementById('result-amount')}
+                step3: {
+                    resultTotal: document.getElementById('result-total'), 
+                    resultDays: document.getElementById('result-days'), 
+                    resultAmount: document.getElementById('result-amount'),
+                    resultRate: document.getElementById('result-rate') // Adicionado para atualizar a taxa exibida
+                }
             };
 
             let currentStep = 1;
             let simulationData = {selectedDays: 0, enteredAmount: 0, calculatedFinalAmount: 0};
+            const baseRate = 0.05; // Taxa de 5% a.m. definida aqui globalmente para o script
 
             const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -484,21 +489,17 @@
                 if (selectedDays > 0 && enteredAmount > 0) {
                     elements.buttons.step1.disabled = false;
                     
-                    const baseRate = 0.0198; // 1.98% a.m.
                     const termInMonths = selectedDays / 30;
                     
                     // Aplicando 100% a fórmula: (Valor da duplicata / (1+taxa)^(prazo/30)) - 1
-                    if ((1 + baseRate) > 0) { // Evita base inválida para potência se baseRate for -1 ou menor
-                        // 1. Calcula: Valor da duplicata / (1+taxa)^(prazo/30)
+                    // com baseRate = 0.05 (5% a.m.)
+                    if ((1 + baseRate) > 0) { 
                         let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
-                        
-                        // 2. Subtrai 1 do resultado acima
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
                     } else {
-                        simulationData.calculatedFinalAmount = 0; // Caso de erro na base da taxa
+                        simulationData.calculatedFinalAmount = 0; 
                     }
 
-                    // Garante que o valor final não seja negativo devido à subtração de 1
                     if (simulationData.calculatedFinalAmount < 0) {
                         simulationData.calculatedFinalAmount = 0;
                     }
@@ -546,6 +547,8 @@
                     elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
                     elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
                     elements.step3.resultAmount.textContent = "R$ " + formatCurrency(simulationData.calculatedFinalAmount);
+                    // Atualiza o texto da taxa exibida para refletir a taxa usada no cálculo
+                    elements.step3.resultRate.textContent = `A partir de ${(baseRate * 100).toFixed(2).replace('.', ',')}% a.m.`;
                     showStep(2);
                 }
             });
@@ -601,7 +604,7 @@
                 setTimeout(() => {
                     btn.classList.remove('loading'); btn.disabled = false;
                     const formData = {
-                        simulation: simulationData,
+                        simulation: {...simulationData, rateUsed: baseRate}, // Inclui a taxa usada na simulação
                         registration: {
                             email: elements.step2.emailInput.value, name: elements.step2.nameInput.value,
                             phone: elements.step2.phoneInput.value, companyName: elements.step2.companyNameInput.value,
