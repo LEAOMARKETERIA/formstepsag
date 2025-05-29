@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais II</title>
+    <title>Simulador de Antecipação - Progresso Corrigido</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -171,6 +171,7 @@
             border-bottom-color: var(--primary-dark);
         }
 
+
         .value-prefix { 
             color: var(--text-secondary); 
             font-size: 28px; 
@@ -201,6 +202,7 @@
             display: flex; align-items: flex-start; border-left: 5px solid var(--warning-border);
             position: relative; overflow: hidden; width: 100%; 
         }
+        /* .alert-box::before REGRA REMOVIDA */
         .alert-icon { color: var(--warning-icon); font-size: 26px; margin-right: 18px; margin-top: 1px; }
         .alert-text { color: var(--warning-text); font-size: 15.5px; line-height: 1.65; font-weight: 500; }
         .alert-text strong { font-weight: 700; color: var(--primary-dark); }
@@ -257,7 +259,7 @@
             align-items: center; 
             gap: 0.5em; 
         }
-        /* Links de consentimento removidos, então estas regras não são mais necessárias
+        /* Links de consentimento removidos
         .checkbox-option a { color: var(--primary-highlight); text-decoration: underline; font-weight: 600; } 
         .checkbox-option a:hover { color: var(--primary-highlight-darker); }
         */
@@ -514,10 +516,11 @@
                     monthlyRevenueRadios: document.querySelectorAll('input[name="monthly-revenue"]'),
                     consentCheckboxes: [document.getElementById('consent-1'), document.getElementById('consent-2')],
                 },
-                step3: { // resultRate removido daqui
+                step3: { 
                     resultTotal: document.getElementById('result-total'), 
                     resultDays: document.getElementById('result-days'), 
                     resultAmount: document.getElementById('result-amount')
+                    // resultRate foi removido do elements.step3 pois o elemento HTML foi removido
                 }
             };
 
@@ -530,7 +533,7 @@
             function updateProgressBar() {
                 const totalSteps = Object.keys(elements.stepIndicators).length;
                 const progressPercentage = totalSteps > 1 ? ((currentStep - 1) / (totalSteps - 1)) * 100 : 0;
-                elements.progressFilled.style.width = `${progressPercentage}%`;
+                elements.progressFilled.style.width = `calc(${progressPercentage / 100} * (100% - 70px))`; // Correção da barra
                 for (let i = 1; i <= totalSteps; i++) {
                     const indicator = elements.stepIndicators[i];
                     indicator.classList.remove('active', 'completed');
@@ -573,15 +576,18 @@
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0;
+                // Usamos a variável global baseRate que é atualizada pelo listener dos radios
+                // A verificação checkedHealthRadio aqui é uma dupla checagem para o estado atual, se necessário.
+                const currentSelectedRateForValidation = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : baseRate;
 
-                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
+
+                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateForValidation > 0) { 
                     elements.buttons.step1.disabled = false;
                     
                     const termInMonths = selectedDays / 30;
-                    // Usamos currentSelectedRateValue para o cálculo, que reflete a taxa selecionada no momento
-                    if ((1 + currentSelectedRateValue) > 0) { 
-                        let discountedValue = enteredAmount / Math.pow((1 + currentSelectedRateValue), termInMonths);
+                    // Usar a variável global 'baseRate' que foi definida pelo evento 'change' do radio button
+                    if ((1 + baseRate) > 0) { 
+                        let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
                     } else {
                         simulationData.calculatedFinalAmount = 0; 
