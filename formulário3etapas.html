@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Correções Finais</title>
+    <title>Simulador de Antecipação - Alinhamento Corrigido</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -150,24 +150,49 @@
             border-radius: 18px; padding: 24px 28px; 
             border: 2px solid transparent; transition: all 0.25s ease;
         }
-        .value-input:focus-within { border-color: var(--primary-dark); box-shadow: 0 0 0 4px var(--primary-dark-shadow); }
-        .value-input label { margin-bottom: 14px; color: var(--primary-dark); font-weight: 600; font-size: 17px; display: block; } 
-        .value-prefix {
-            position: absolute; left: 28px; 
-            bottom: 25px; 
-            line-height: 1; 
-            color: var(--text-secondary); font-size: 30px;
-            font-weight: 600; pointer-events: none;
+        .value-input:focus-within { 
+            border-color: var(--primary-dark); 
+            box-shadow: 0 0 0 4px var(--primary-dark-shadow); 
         }
-        .value-input input {
-            width: 100%; padding: 8px 0px 8px 60px; 
-            border: none; border-bottom: 3px solid var(--border-medium); font-size: 38px; font-weight: 700;
-            color: var(--primary-dark); background: transparent; transition: border-color 0.25s ease;
-            line-height: 1.3; 
+        .value-input label { 
+            margin-bottom: 14px; color: var(--primary-dark); font-weight: 600; 
+            font-size: 17px; display: block; 
+        }
+        
+        .value-field-wrapper { /* NOVO WRAPPER */
+            display: flex;
+            align-items: baseline; /* CHAVE PARA O ALINHAMENTO! */
+            gap: 8px; 
+            border-bottom: 3px solid var(--border-medium);
+            transition: border-color 0.25s ease;
+            padding-bottom: 5px; 
+        }
+        .value-field-wrapper:focus-within { /* Estilo de foco na borda inferior */
+            border-bottom-color: var(--primary-dark);
+        }
+
+        .value-prefix { /* Estilo do "R$" */
+            color: var(--text-secondary); 
+            font-size: 28px; /* Reduzido um pouco para melhor proporção */
+            font-weight: 600; 
+            line-height: 1.3; /* Para ajudar no alinhamento de baseline com input */
+        }
+
+        .value-input input { /* Input de valor numérico */
+            width: auto; 
+            flex-grow: 1; 
+            padding: 0; /* Padding vertical agora é mais pelo line-height */
+            border: none; 
+            font-size: 38px; 
+            font-weight: 700;
+            color: var(--primary-dark); 
+            background: transparent;
+            line-height: 1.3; /* Alinha com o prefixo */
             height: auto; 
+            outline: none; 
         }
         .value-input input::placeholder { color: var(--border-medium); }
-        .value-input input:focus { outline: none; border-bottom-color: var(--primary-dark); }
+        
 
         .alert-box {
             background: var(--warning-bg); border-radius: 16px; padding: 20px 22px; 
@@ -198,7 +223,7 @@
 
         .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
         .radio-option, .checkbox-option {
-            display: flex; align-items: center; /* Para alinhar input e label */
+            display: flex; align-items: center; 
             padding: 16px; border-radius: 14px; cursor: pointer;
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
             background-color: var(--background-input-area); border: 2px solid transparent;
@@ -225,14 +250,13 @@
              border-color: var(--primary-dark); 
         }
         
-        /* Ajuste para melhor alinhamento do emoji com o texto */
         .radio-option label.radio-label, 
         .checkbox-option label.checkbox-label { 
             font-weight: 500; cursor: pointer; color: var(--text-primary); 
             flex-grow: 1; font-size: 16px; line-height: 1.5;
-            display: inline-flex; /* Para alinhar emoji/texto */
-            align-items: center; /* Alinha emoji/texto verticalmente */
-            gap: 0.5em; /* Espaço entre emoji e texto */
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.5em; 
         }
         .checkbox-option a { color: var(--primary-highlight); text-decoration: underline; font-weight: 600; } 
         .checkbox-option a:hover { color: var(--primary-highlight-darker); }
@@ -269,8 +293,8 @@
             .maturity-option { height: 65px; font-size: 18px; }
             .value-input { padding: 20px 24px; }
             .value-input label {margin-bottom: 10px;}
-            .value-input input { font-size: 30px; padding: 6px 0px 6px 50px; line-height: 1.3; }
-            .value-prefix { font-size: 26px; left: 24px; bottom: 21px; }
+            .value-input input { font-size: 30px; } /* Padding e prefixo já ajustados */
+            .value-prefix { font-size: 26px; }
 
             .progress-step { width: 32px; height: 32px; font-size: 14px; }
             .progress-line { width: calc(100% - 60px); left: 30px; }
@@ -291,8 +315,8 @@
             .result-value.highlight { font-size: 26px; }
             .button { padding: 15px 25px; font-size: 16px; min-width: 100%; } 
             .value-input { padding: 18px 20px; }
-            .value-input input { font-size: 24px; padding: 4px 0px 4px 45px; line-height: 1.3; }
-            .value-prefix { font-size: 20px; left: 20px; bottom: 18px; }
+            .value-input input { font-size: 24px; }
+            .value-prefix { font-size: 20px; }
             .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
         }
 
@@ -330,8 +354,10 @@
 
             <div class="value-input">
                 <label for="amount-input">2- Valor da duplicata ou fatura que deseja antecipar:</label>
-                <span class="value-prefix">R$</span>
-                <input type="text" id="amount-input" placeholder="0,00" inputmode="decimal">
+                <div class="value-field-wrapper">
+                    <span class="value-prefix">R$</span>
+                    <input type="text" id="amount-input" placeholder="0,00" inputmode="decimal">
+                </div>
             </div>
 
             <fieldset class="input-group" aria-labelledby="financial-health-legend">
@@ -550,16 +576,18 @@
 
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
-                // Lê a taxa diretamente dos radios para garantir o valor mais atual na validação do botão
+                // Lê a taxa dos radios para garantir o valor mais atual na validação do botão
+                // A variável global 'baseRate' já foi atualizada pelo listener do radio
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRate = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0;
+                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0;
 
-                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRate > 0) { 
+
+                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
                     
-                    // Usa a variável baseRate que foi atualizada pelo evento de change do radio
+                    // Usa a variável global baseRate que foi atualizada pelo evento de change do radio
                     const termInMonths = selectedDays / 30;
-                    if ((1 + baseRate) > 0) { 
+                    if ((1 + baseRate) > 0) { // baseRate aqui é a global, já atualizada
                         let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
                     } else {
@@ -573,7 +601,6 @@
                     elements.buttons.step1.disabled = true;
                     simulationData.calculatedFinalAmount = 0; 
                 }
-                 // console.log('ValidateStep1 Called:', { selectedDays, enteredAmount, baseRate: currentSelectedRate, buttonDisabled: elements.buttons.step1.disabled });
             }
 
             function validateStep2() {
@@ -610,10 +637,9 @@
             elements.step1.financialHealthRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
-                        baseRate = parseFloat(radio.value); // Atualiza a variável global baseRate
-                        // Atualiza o texto do alerta com base na seleção
-                        const alertTextEl = elements.step1.amountInput.closest('.step-container').querySelector('.alert-text');
-                        if (baseRate === 0.025) { // Assumindo que 2.5% é a menor taxa
+                        baseRate = parseFloat(radio.value); 
+                        const alertTextEl = document.querySelector('#step1 .alert-text'); // Mais específico
+                        if (baseRate === 0.025) { 
                              alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                         } else {
                              alertTextEl.innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
