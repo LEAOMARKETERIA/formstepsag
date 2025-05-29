@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Alinhamento Corrigido</title>
+    <title>Simulador de Antecipação - Texto Atualizado</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -159,35 +159,36 @@
             font-size: 17px; display: block; 
         }
         
-        .value-field-wrapper { /* NOVO WRAPPER */
+        .value-field-wrapper { 
             display: flex;
-            align-items: baseline; /* CHAVE PARA O ALINHAMENTO! */
+            align-items: baseline; 
             gap: 8px; 
             border-bottom: 3px solid var(--border-medium);
             transition: border-color 0.25s ease;
             padding-bottom: 5px; 
         }
-        .value-field-wrapper:focus-within { /* Estilo de foco na borda inferior */
+        .value-field-wrapper:focus-within { 
             border-bottom-color: var(--primary-dark);
         }
 
-        .value-prefix { /* Estilo do "R$" */
+
+        .value-prefix { 
             color: var(--text-secondary); 
-            font-size: 28px; /* Reduzido um pouco para melhor proporção */
+            font-size: 28px; 
             font-weight: 600; 
-            line-height: 1.3; /* Para ajudar no alinhamento de baseline com input */
+            line-height: 1.3; 
         }
 
-        .value-input input { /* Input de valor numérico */
+        .value-input input { 
             width: auto; 
             flex-grow: 1; 
-            padding: 0; /* Padding vertical agora é mais pelo line-height */
+            padding: 0; 
             border: none; 
             font-size: 38px; 
             font-weight: 700;
             color: var(--primary-dark); 
             background: transparent;
-            line-height: 1.3; /* Alinha com o prefixo */
+            line-height: 1.3; 
             height: auto; 
             outline: none; 
         }
@@ -201,7 +202,7 @@
             display: flex; align-items: flex-start; border-left: 5px solid var(--warning-border);
             position: relative; overflow: hidden; width: 100%; 
         }
-        /* .alert-box::before REGRA REMOVIDA para tirar linha laranja */
+        /* .alert-box::before REGRA REMOVIDA */
         .alert-icon { color: var(--warning-icon); font-size: 26px; margin-right: 18px; margin-top: 1px; }
         .alert-text { color: var(--warning-text); font-size: 15.5px; line-height: 1.65; font-weight: 500; }
         .alert-text strong { font-weight: 700; color: var(--primary-dark); }
@@ -293,7 +294,7 @@
             .maturity-option { height: 65px; font-size: 18px; }
             .value-input { padding: 20px 24px; }
             .value-input label {margin-bottom: 10px;}
-            .value-input input { font-size: 30px; } /* Padding e prefixo já ajustados */
+            .value-input input { font-size: 30px; } 
             .value-prefix { font-size: 26px; }
 
             .progress-step { width: 32px; height: 32px; font-size: 14px; }
@@ -370,11 +371,11 @@
                     </div>
                     <div class="radio-option" tabindex="0">
                         <input type="radio" id="health-medium" name="financial-health" value="0.035" required>
-                        <label for="health-medium" class="radio-label">🟧 Endividada, mas conseguindo se manter</label>
+                        <label for="health-medium" class="radio-label">🟧 Com restrições, mas conseguindo se manter</label>
                     </div>
                     <div class="radio-option" tabindex="0">
                         <input type="radio" id="health-bad" name="financial-health" value="0.05" required>
-                        <label for="health-bad" class="radio-label">🟥 Muito endividada e com grandes dificuldades financeiras</label>
+                        <label for="health-bad" class="radio-label">🟥 Com muitas restrições e com grandes dificuldades financeiras</label>
                     </div>
                 </div>
             </fieldset>
@@ -576,19 +577,17 @@
 
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
-                // Lê a taxa dos radios para garantir o valor mais atual na validação do botão
-                // A variável global 'baseRate' já foi atualizada pelo listener do radio
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
                 const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0;
-
 
                 if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
                     
-                    // Usa a variável global baseRate que foi atualizada pelo evento de change do radio
                     const termInMonths = selectedDays / 30;
-                    if ((1 + baseRate) > 0) { // baseRate aqui é a global, já atualizada
-                        let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
+                    // A variável global 'baseRate' já foi atualizada pelo listener do radio antes desta função ser chamada.
+                    // No entanto, para o cálculo imediato, usamos currentSelectedRateValue para garantir.
+                    if ((1 + currentSelectedRateValue) > 0) { 
+                        let discountedValue = enteredAmount / Math.pow((1 + currentSelectedRateValue), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
                     } else {
                         simulationData.calculatedFinalAmount = 0; 
@@ -637,8 +636,8 @@
             elements.step1.financialHealthRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
-                        baseRate = parseFloat(radio.value); 
-                        const alertTextEl = document.querySelector('#step1 .alert-text'); // Mais específico
+                        baseRate = parseFloat(radio.value); // Atualiza a variável global baseRate
+                        const alertTextEl = document.querySelector('#step1 .alert-text');
                         if (baseRate === 0.025) { 
                              alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                         } else {
@@ -650,7 +649,7 @@
             });
 
             elements.buttons.step1.addEventListener('click', () => {
-                validateStep1(); 
+                validateStep1(); // Revalida e recalcula com os valores mais atuais antes de prosseguir
                 if (!elements.buttons.step1.disabled) {
                     elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
                     elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
