@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Texto Atualizado</title>
+    <title>Simulador de Antecipação - Ajustes Finais II</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -171,7 +171,6 @@
             border-bottom-color: var(--primary-dark);
         }
 
-
         .value-prefix { 
             color: var(--text-secondary); 
             font-size: 28px; 
@@ -202,7 +201,6 @@
             display: flex; align-items: flex-start; border-left: 5px solid var(--warning-border);
             position: relative; overflow: hidden; width: 100%; 
         }
-        /* .alert-box::before REGRA REMOVIDA */
         .alert-icon { color: var(--warning-icon); font-size: 26px; margin-right: 18px; margin-top: 1px; }
         .alert-text { color: var(--warning-text); font-size: 15.5px; line-height: 1.65; font-weight: 500; }
         .alert-text strong { font-weight: 700; color: var(--primary-dark); }
@@ -259,8 +257,10 @@
             align-items: center; 
             gap: 0.5em; 
         }
+        /* Links de consentimento removidos, então estas regras não são mais necessárias
         .checkbox-option a { color: var(--primary-highlight); text-decoration: underline; font-weight: 600; } 
         .checkbox-option a:hover { color: var(--primary-highlight-darker); }
+        */
 
         .result-container {
             background: var(--background-input-area); padding: 36px; border-radius: 20px; margin-bottom: 40px;
@@ -456,11 +456,11 @@
                     <div class="checkbox-group">
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="#politica-privacidade" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</label>
+                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a Política de Privacidade.</label>
                         </div>
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <a href="#politica-autorizacao-scr" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.</label>
+                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a Autorização SCR, permitindo a consulta das minhas informações conforme descrito.</label>
                         </div>
                     </div>
                 </fieldset>
@@ -481,10 +481,6 @@
                 <div class="result-row">
                     <div class="result-label">Prazo de Vencimento Considerado</div>
                     <div class="result-value" id="result-days">0 dias</div>
-                </div>
-                <div class="result-row">
-                    <div class="result-label">Taxa de Antecipação Utilizada</div>
-                    <div class="result-value" id="result-rate">A definir</div> 
                 </div>
                 <div class="result-row">
                     <div class="result-label">Valor Estimado a Receber*</div>
@@ -518,11 +514,10 @@
                     monthlyRevenueRadios: document.querySelectorAll('input[name="monthly-revenue"]'),
                     consentCheckboxes: [document.getElementById('consent-1'), document.getElementById('consent-2')],
                 },
-                step3: {
+                step3: { // resultRate removido daqui
                     resultTotal: document.getElementById('result-total'), 
                     resultDays: document.getElementById('result-days'), 
-                    resultAmount: document.getElementById('result-amount'),
-                    resultRate: document.getElementById('result-rate') 
+                    resultAmount: document.getElementById('result-amount')
                 }
             };
 
@@ -584,8 +579,7 @@
                     elements.buttons.step1.disabled = false;
                     
                     const termInMonths = selectedDays / 30;
-                    // A variável global 'baseRate' já foi atualizada pelo listener do radio antes desta função ser chamada.
-                    // No entanto, para o cálculo imediato, usamos currentSelectedRateValue para garantir.
+                    // Usamos currentSelectedRateValue para o cálculo, que reflete a taxa selecionada no momento
                     if ((1 + currentSelectedRateValue) > 0) { 
                         let discountedValue = enteredAmount / Math.pow((1 + currentSelectedRateValue), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
@@ -636,7 +630,7 @@
             elements.step1.financialHealthRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
-                        baseRate = parseFloat(radio.value); // Atualiza a variável global baseRate
+                        baseRate = parseFloat(radio.value); 
                         const alertTextEl = document.querySelector('#step1 .alert-text');
                         if (baseRate === 0.025) { 
                              alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
@@ -649,12 +643,12 @@
             });
 
             elements.buttons.step1.addEventListener('click', () => {
-                validateStep1(); // Revalida e recalcula com os valores mais atuais antes de prosseguir
+                validateStep1(); 
                 if (!elements.buttons.step1.disabled) {
                     elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
                     elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
                     elements.step3.resultAmount.textContent = "R$ " + formatCurrency(simulationData.calculatedFinalAmount);
-                    elements.step3.resultRate.textContent = `${(baseRate * 100).toFixed(2).replace('.', ',')}% a.m.`;
+                    // Linha que atualizava elements.step3.resultRate foi removida
                     showStep(2);
                 }
             });
