@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Menos Cansativo</title>
+    <title>Simulador de Antecipação - Ajustes Finais III</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +32,6 @@
             --warning-icon: #fab363;
             --font-main: 'Montserrat', sans-serif;
 
-            /* Cores para validação inline */
             --success-color: #28a745;
             --danger-color: #dc3545;
             --success-shadow: rgba(40, 167, 69, 0.15);
@@ -110,6 +109,7 @@
             line-height: 1.65; font-weight: 400; 
         }
 
+
         .maturity-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 16px; margin-bottom: 30px; }
         .maturity-option {
             height: 70px; border: 2px solid var(--border-light); border-radius: 16px; display: flex;
@@ -148,7 +148,7 @@
         .input-group input[type="tel"]:focus, 
         .input-group select:focus {
             outline: none; 
-            border-color: var(--primary-dark); /* Foco padrão */
+            border-color: var(--primary-dark); 
             box-shadow: 0 0 0 4px var(--primary-dark-shadow);
             transform: translateY(-1px);
         }
@@ -159,7 +159,6 @@
             border-color: var(--border-dark); 
         }
         
-        /* Validação Inline */
         .input-group input.is-valid { border-color: var(--success-color); }
         .input-group input.is-valid:focus {
             border-color: var(--success-color);
@@ -285,7 +284,7 @@
             align-items: center; 
             gap: 0.5em; 
         }
-       
+
         .result-container {
             background: var(--background-input-area); padding: 36px; border-radius: 20px; margin-bottom: 40px;
             border: 1px solid var(--border-light); position: relative; overflow: hidden;
@@ -345,9 +344,22 @@
             .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
         }
 
-        :focus-visible { outline: 3px solid var(--primary-highlight); outline-offset: 3px; } 
+        /* Foco para inputs de texto e botões principais usa --primary-highlight */
+        :focus-visible { 
+            outline: 3px solid var(--primary-highlight); 
+            outline-offset: 3px; 
+        }
+        /* Foco para maturity-option, radio-option, checkbox-option usa --primary-dark */
+        .maturity-option:focus-visible, 
+        .radio-option:focus-visible, 
+        .checkbox-option:focus-visible { 
+            position: relative; z-index: 10; 
+            /* Usar box-shadow aqui para não afetar o layout com outline, e usar cor escura */
+            box-shadow: 0 0 0 2px var(--background-container), 0 0 0 4px var(--primary-dark) !important; 
+            outline: none; /* Remove o outline padrão para dar prioridade ao box-shadow */
+        }
         :focus:not(:focus-visible) { outline: none; }
-        .maturity-option:focus-visible, .radio-option:focus-visible, .checkbox-option:focus-visible { position: relative; z-index: 10; box-shadow: 0 0 0 2px var(--background-container), 0 0 0 4px var(--primary-highlight) !important; }
+        
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
     </style>
 </head>
@@ -529,7 +541,7 @@
                     amountInput: document.getElementById('amount-input'), 
                     maturityOptions: document.querySelectorAll('.maturity-option'),
                     financialHealthRadios: document.querySelectorAll('input[name="financial-health"]'),
-                    alertTextStep1: document.querySelector('#step1 .alert-text') // Seletor para o texto do alerta da Etapa 1
+                    alertTextStep1: document.querySelector('#step1 .alert-text') 
                 },
                 step2: {
                     registrationForm: document.getElementById('registration-form'), emailInput: document.getElementById('email-input'),
@@ -543,7 +555,6 @@
                     resultTotal: document.getElementById('result-total'), 
                     resultDays: document.getElementById('result-days'), 
                     resultAmount: document.getElementById('result-amount')
-                    // resultRate (elemento) foi removido, mas a variável baseRate será usada para o log.
                 }
             };
 
@@ -575,12 +586,10 @@
                 currentStep = stepNumber;
                 updateProgressBar();
                 
-                // Autofoco no primeiro input/elemento interativo da etapa
                 const firstFocusableElement = targetStepContainer.querySelector(
-                    'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), .maturity-option, .radio-option, .checkbox-option, button:not(:disabled)'
+                    'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), .maturity-option[tabindex="0"], .radio-option[tabindex="0"], .checkbox-option[tabindex="0"], button:not(:disabled)'
                 );
                 if (firstFocusableElement) {
-                    // Pequeno delay para garantir que o elemento está visível e renderizado após a transição CSS
                     setTimeout(() => firstFocusableElement.focus(), 50); 
                 } else {
                      targetStepContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -613,13 +622,14 @@
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                // A variável global `baseRate` já foi atualizada pelo listener do radio.
-                // Usamos `baseRate` diretamente aqui para o cálculo, e a verificação é se ela é > 0.
-                
-                if (selectedDays > 0 && enteredAmount > 0 && baseRate > 0) { 
+                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; // Usar 0 se nada selecionado
+
+                // 'baseRate' global é atualizada pelo listener do radio. Usamos 'currentSelectedRateValue' para a lógica de habilitação aqui.
+                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
                     
                     const termInMonths = selectedDays / 30;
+                    // Usar a variável global 'baseRate' para o cálculo, pois ela foi atualizada pelo evento 'change'.
                     if ((1 + baseRate) > 0) { 
                         let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
@@ -643,11 +653,10 @@
                 inputElement.classList.toggle('is-invalid', !isValid);
             }
 
-
             function validateStep2() {
                 const { emailInput, nameInput, phoneInput, companyNameInput, cnpjInput, consentCheckboxes } = elements.step2;
                 const isEmailValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-                const isNameValid = nameInput.value.trim().length >= 3; // Exemplo: nome com pelo menos 3 chars
+                const isNameValid = nameInput.value.trim().length >= 3; 
                 const isPhoneValid = phoneInput.value.replace(/\D/g, '').length >= 10;
                 const isCompanyNameValid = companyNameInput.value.trim().length >= 2;
                 const isCnpjValid = cnpjInput.value.replace(/\D/g, '').length === 14;
@@ -657,7 +666,6 @@
                 elements.buttons.step2.disabled = !(isEmailValid && isNameValid && isPhoneValid && isCompanyNameValid && isCnpjValid && isYearsOperationSelected && isMonthlyRevenueSelected && areConsentsChecked);
             }
 
-            // Event listeners para Etapa 1
             elements.step1.amountInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '');
                 simulationData.enteredAmount = value ? parseInt(value, 10) / 100 : 0;
@@ -680,8 +688,8 @@
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
                         baseRate = parseFloat(radio.value); 
-                        const alertTextEl = elements.step1.alertTextStep1; // Usando seletor cacheado
-                        if (alertTextEl) { // Verifica se o elemento existe
+                        const alertTextEl = elements.step1.alertTextStep1; 
+                        if (alertTextEl) { 
                             if (baseRate === 0.025) { 
                                  alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                             } else {
@@ -703,8 +711,7 @@
                 }
             });
             
-            // Event listeners para Etapa 2 com validação inline visual
-            const inputsToValidate = [
+            const inputsToValidateStep2 = [
                 {el: elements.step2.emailInput, fn: val => elements.step2.emailInput.checkValidity() && val.trim() !== ''},
                 {el: elements.step2.nameInput, fn: val => val.trim().length >= 3},
                 {el: elements.step2.phoneInput, fn: val => val.replace(/\D/g, '').length >= 10},
@@ -712,12 +719,20 @@
                 {el: elements.step2.cnpjInput, fn: val => val.replace(/\D/g, '').length === 14}
             ];
 
-            inputsToValidate.forEach(item => {
-                if(item.el) { // Verifica se o elemento existe
+            inputsToValidateStep2.forEach(item => {
+                if(item.el) { 
                     item.el.addEventListener('blur', () => validateAndStyleInput(item.el, item.fn));
+                     // Adicionar validação no input também para feedback mais rápido, se desejado
+                    item.el.addEventListener('input', () => {
+                        // Para não validar agressivamente em cada tecla, pode-se adicionar um debounce
+                        // ou validar apenas se o campo já foi marcado como inválido anteriormente.
+                        if (item.el.classList.contains('is-invalid')) {
+                            validateAndStyleInput(item.el, item.fn);
+                        }
+                         validateStep2(); // Revalida o botão de avançar a cada input
+                    });
                 }
             });
-
             elements.step2.phoneInput.addEventListener('input', applyPhoneMask);
             elements.step2.cnpjInput.addEventListener('input', applyCnpjMask);
 
@@ -751,14 +766,12 @@
             });
 
             elements.buttons.step2.addEventListener('click', () => {
-                // Força a validação visual de todos os campos antes de tentar avançar
-                inputsToValidate.forEach(item => validateAndStyleInput(item.el, item.fn));
-                validateStep2(); // Valida o estado geral do botão
+                inputsToValidateStep2.forEach(item => validateAndStyleInput(item.el, item.fn));
+                validateStep2(); 
 
                 if (!elements.buttons.step2.disabled) showStep(3);
                 else {
-                    // elements.step2.registrationForm.reportValidity(); // Pode ser redundante se já tiver feedback inline
-                    const firstInvalid = elements.step2.registrationForm.querySelector('.is-invalid, :invalid'); // Prioriza nossa classe ou o pseudo-seletor
+                    const firstInvalid = elements.step2.registrationForm.querySelector('.is-invalid, :invalid'); 
                     firstInvalid?.focus();
                 }
             });
@@ -780,12 +793,12 @@
                         }
                     };
                     console.log('Dados Finais da Solicitação:', formData);
-                    alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)');
+                    // alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)'); // REMOVIDO
                 }, 2500);
             });
 
             // Inicialização
-            showStep(1); // Garante que o autofoco seja chamado para a primeira etapa
+            showStep(1); 
             validateStep1(); 
             validateStep2();
         });
