@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Saúde Financeira e Fundo Branco</title>
+    <title>Simulador de Antecipação - Correções Finais</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,7 +21,7 @@
             --border-medium: #cbd5e1; 
             --border-dark: #a0aec0; 
 
-            --background-body-html: #ffffff; /* ALTERADO PARA BRANCO */
+            --background-body-html: #ffffff; 
             --background-container: #ffffff; 
             --background-input-area: #f8faff; 
             --background-option-hover: #e9e9e9; 
@@ -99,7 +99,7 @@
             color: var(--primary-dark);
             margin-bottom: 25px;
         }
-        p:not(.step-instruction):not(.legend-description) { /* Parágrafos de descrição geral das etapas */
+        p:not(.step-instruction):not(.legend-description) { 
             color: var(--text-secondary); margin-bottom: 30px; font-size: 17px; 
             line-height: 1.65; font-weight: 400; 
         }
@@ -126,7 +126,7 @@
             font-size: 16px;
             color: var(--text-secondary);
             margin-bottom: 15px;
-            margin-top: 0; /* Reset margin-top for this p */
+            margin-top: 0; 
             font-weight: 400;
             line-height: 1.5;
         }
@@ -176,7 +176,7 @@
             display: flex; align-items: flex-start; border-left: 5px solid var(--warning-border);
             position: relative; overflow: hidden; width: 100%; 
         }
-        .alert-box::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--warning-border), #fdd8a4); }
+        /* .alert-box::before REGRA REMOVIDA para tirar linha laranja */
         .alert-icon { color: var(--warning-icon); font-size: 26px; margin-right: 18px; margin-top: 1px; }
         .alert-text { color: var(--warning-text); font-size: 15.5px; line-height: 1.65; font-weight: 500; }
         .alert-text strong { font-weight: 700; color: var(--primary-dark); }
@@ -198,7 +198,8 @@
 
         .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
         .radio-option, .checkbox-option {
-            display: flex; align-items: center; padding: 16px; border-radius: 14px; cursor: pointer;
+            display: flex; align-items: center; /* Para alinhar input e label */
+            padding: 16px; border-radius: 14px; cursor: pointer;
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
             background-color: var(--background-input-area); border: 2px solid transparent;
         }
@@ -223,7 +224,16 @@
         .radio-option input[type="radio"]:checked, .checkbox-option input[type="checkbox"]:checked {
              border-color: var(--primary-dark); 
         }
-        .radio-option label.radio-label, .checkbox-option label.checkbox-label { font-weight: 500; cursor: pointer; color: var(--text-primary); flex-grow: 1; font-size: 16px; line-height: 1.5; }
+        
+        /* Ajuste para melhor alinhamento do emoji com o texto */
+        .radio-option label.radio-label, 
+        .checkbox-option label.checkbox-label { 
+            font-weight: 500; cursor: pointer; color: var(--text-primary); 
+            flex-grow: 1; font-size: 16px; line-height: 1.5;
+            display: inline-flex; /* Para alinhar emoji/texto */
+            align-items: center; /* Alinha emoji/texto verticalmente */
+            gap: 0.5em; /* Espaço entre emoji e texto */
+        }
         .checkbox-option a { color: var(--primary-highlight); text-decoration: underline; font-weight: 600; } 
         .checkbox-option a:hover { color: var(--primary-highlight-darker); }
 
@@ -304,7 +314,9 @@
 
         <div class="step-container active" id="step1">
             <h1>Simule sua Antecipação</h1>
-            <p class="step-instruction">Siga os passos abaixo para simular sua antecipação:</p> <div class="input-group">
+            <p class="step-instruction">Siga os passos abaixo para simular sua antecipação:</p>
+            
+            <div class="input-group">
                 <label for="maturity-options-id" class="input-group-legend">1- Prazo de vencimento (dias):</label>
                 <div class="maturity-options" id="maturity-options-id" role="group" aria-labelledby="maturity-options-id">
                     <div class="maturity-option" data-days="15" tabindex="0" role="button">15</div>
@@ -538,12 +550,15 @@
 
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
-                // baseRate é atualizado pelo event listener dos radios de saúde financeira
-                if (selectedDays > 0 && enteredAmount > 0 && baseRate > 0) { 
+                // Lê a taxa diretamente dos radios para garantir o valor mais atual na validação do botão
+                const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
+                const currentSelectedRate = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0;
+
+                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRate > 0) { 
                     elements.buttons.step1.disabled = false;
                     
+                    // Usa a variável baseRate que foi atualizada pelo evento de change do radio
                     const termInMonths = selectedDays / 30;
-                    
                     if ((1 + baseRate) > 0) { 
                         let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
@@ -554,11 +569,11 @@
                     if (simulationData.calculatedFinalAmount < 0) {
                         simulationData.calculatedFinalAmount = 0;
                     }
-
                 } else {
                     elements.buttons.step1.disabled = true;
                     simulationData.calculatedFinalAmount = 0; 
                 }
+                 // console.log('ValidateStep1 Called:', { selectedDays, enteredAmount, baseRate: currentSelectedRate, buttonDisabled: elements.buttons.step1.disabled });
             }
 
             function validateStep2() {
@@ -595,12 +610,13 @@
             elements.step1.financialHealthRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (radio.checked) {
-                        baseRate = parseFloat(radio.value);
-                        // Atualiza o texto do alerta para refletir a menor taxa possível (que é a da opção "boa")
-                        if (baseRate === 0.025) {
-                             elements.step1.querySelector('.alert-text').innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
+                        baseRate = parseFloat(radio.value); // Atualiza a variável global baseRate
+                        // Atualiza o texto do alerta com base na seleção
+                        const alertTextEl = elements.step1.amountInput.closest('.step-container').querySelector('.alert-text');
+                        if (baseRate === 0.025) { // Assumindo que 2.5% é a menor taxa
+                             alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                         } else {
-                             elements.step1.querySelector('.alert-text').innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
+                             alertTextEl.innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
                         }
                         validateStep1(); 
                     }
@@ -684,7 +700,6 @@
                 }, 2500);
             });
 
-            // Inicialização
             updateProgressBar(); validateStep1(); validateStep2();
         });
     </script>
