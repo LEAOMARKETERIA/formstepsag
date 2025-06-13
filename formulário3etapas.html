@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Final</title>
+    <title>Simulador de Antecipação - Versão Final com Link Sutil</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -295,13 +295,18 @@
             align-items: center; 
             gap: 0.5em; 
         }
+
+        /* Estilo sutil para o link no checkbox */
         .checkbox-label a {
-            color: var(--primary-highlight);
-            font-weight: 600;
-            text-decoration: none;
+            color: inherit; /* Herda a cor do texto pai (preto) */
+            font-weight: 600; /* Mantém um leve destaque */
+            text-decoration: none; /* Remove o sublinhado padrão */
+            border-bottom: 1px dotted var(--text-primary); /* Adiciona o sublinhado pontilhado sutil */
+            padding-bottom: 1px;
+            transition: border-bottom-style 0.2s ease;
         }
         .checkbox-label a:hover {
-            text-decoration: underline;
+            border-bottom-style: solid; /* O sublinhado fica sólido no hover */
         }
 
         .result-container {
@@ -517,7 +522,9 @@
                         
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a Autorização SCR, permitindo a consulta das minhas informações conforme descrito.</label>
+                            <label for="consent-2" class="checkbox-label">
+                                Declaro ter lido e aceito a <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.
+                            </label>
                         </div>
                     </div>
                 </fieldset>
