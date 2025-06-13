@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais V</title>
+    <title>Simulador de Antecipação - Ajustes Finais VI</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -122,6 +122,13 @@
         .maturity-option.selected:hover { background: var(--primary-dark); }
 
         .input-group { margin-bottom: 30px; }
+
+        /* ALTERAÇÃO CORRETIVA: Remove a borda padrão que os navegadores aplicam a elementos <fieldset> */
+        fieldset.input-group {
+            border: 0;
+            padding: 0;
+        }
+
         .input-group label:not(.checkbox-label):not(.radio-label), 
         .input-group .input-group-legend { 
              display: block; margin-bottom: 8px; color: var(--primary-dark); 
@@ -249,18 +256,17 @@
 
         .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
         
-        /* ALTERAÇÃO CSS: Estilo das opções para um visual mais limpo, sem caixas */
         .radio-option, .checkbox-option {
             display: flex; 
             align-items: center; 
-            padding: 8px 0; /* Ajuste no padding para manter o espaçamento vertical */
+            padding: 8px 0;
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
-            background-color: transparent; /* Remove o fundo */
-            border: 2px solid transparent; /* Garante que o espaço da borda não cause 'pulos' no layout */
+            background-color: transparent;
+            border: 2px solid transparent;
         }
         .radio-option:hover, .checkbox-option:hover {
-            background-color: var(--background-input-area); /* Efeito de hover mais sutil */
+            background-color: var(--background-input-area);
             border-radius: 8px;
         }
 
@@ -710,7 +716,7 @@
                             if (baseRate === 0.025) { 
                                  alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                             } else {
-                                 alertTextEl.innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
+                                 alertTextEl.innerHTML = '<strong>Importe:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
                             }
                         }
                         validateStep1(); 
