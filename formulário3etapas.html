@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais VI</title>
+    <title>Simulador de Antecipação - Versão Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -123,7 +123,6 @@
 
         .input-group { margin-bottom: 30px; }
 
-        /* ALTERAÇÃO CORRETIVA: Remove a borda padrão que os navegadores aplicam a elementos <fieldset> */
         fieldset.input-group {
             border: 0;
             padding: 0;
@@ -518,7 +517,7 @@
                         
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.</label>
+                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <span style="white-space: nowrap;"><a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>,</span> permitindo a consulta das minhas informações conforme descrito.</label>
                         </div>
                     </div>
                 </fieldset>
@@ -645,14 +644,12 @@
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; // Usar 0 se nada selecionado
+                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; 
 
-                // 'baseRate' global é atualizada pelo listener do radio. Usamos 'currentSelectedRateValue' para a lógica de habilitação aqui.
                 if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
                    
                     const termInMonths = selectedDays / 30;
-                    // Usar a variável global 'baseRate' para o cálculo, pois ela foi atualizada pelo evento 'change'.
                     if ((1 + baseRate) > 0) { 
                         let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
                         simulationData.calculatedFinalAmount = discountedValue - 1; 
@@ -716,7 +713,7 @@
                             if (baseRate === 0.025) { 
                                  alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
                             } else {
-                                 alertTextEl.innerHTML = '<strong>Importe:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
+                                 alertTextEl.innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
                             }
                         }
                         validateStep1(); 
@@ -745,14 +742,11 @@
             inputsToValidateStep2.forEach(item => {
                 if(item.el) { 
                     item.el.addEventListener('blur', () => validateAndStyleInput(item.el, item.fn));
-                     // Adicionar validação no input também para feedback mais rápido, se desejado
                     item.el.addEventListener('input', () => {
-                        // Para não validar agressivamente em cada tecla, pode-se adicionar um debounce
-                        // ou validar apenas se o campo já foi marcado como inválido anteriormente.
                         if (item.el.classList.contains('is-invalid')) {
                             validateAndStyleInput(item.el, item.fn);
                         }
-                         validateStep2(); // Revalida o botão de avançar a cada input
+                         validateStep2();
                     });
                 }
             });
@@ -816,7 +810,6 @@
                         }
                     };
                     console.log('Dados Finais da Solicitação:', formData);
-                    // alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)'); // REMOVIDO
                 }, 2500);
             });
 
