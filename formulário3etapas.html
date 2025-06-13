@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - com Webhook</title>
+    <title>Simulador de Antecipação - Funil Otimizado</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -553,11 +553,7 @@
                 </div>
             </div>
              <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
-            <div class="button-container">
-                
-                <button class="button" id="step3-button"><span class="button-text">Quero antecipar meus recebíveis</span></button>
             </div>
-        </div>
     </div>
 
     <script>
@@ -566,7 +562,7 @@
                 progressFilled: document.getElementById('progress-filled'),
                 stepIndicators: {1: document.getElementById('step1-indicator'), 2: document.getElementById('step2-indicator'), 3: document.getElementById('step3-indicator')},
                 stepContainers: {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3')},
-                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button'), step3: document.getElementById('step3-button')},
+                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button')}, // Botão 3 removido
                 step1: {
                     amountInput: document.getElementById('amount-input'), 
                     maturityOptions: document.querySelectorAll('.maturity-option'),
@@ -696,6 +692,21 @@
                 elements.buttons.step2.disabled = !(isEmailValid && isNameValid && isPhoneValid && isCompanyNameValid && isCnpjValid && isYearsOperationSelected && isMonthlyRevenueSelected && areConsentsChecked);
             }
 
+            async function submitToWebhook(data) {
+                const webhookUrl = 'https://hook.us1.make.com/8bt556rvouc1aigqvjrcalmergdy1498';
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                    });
+                    return response.ok;
+                } catch (error) {
+                    console.error('Erro ao enviar para o webhook:', error);
+                    return false;
+                }
+            }
+
             elements.step1.amountInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '');
                 simulationData.enteredAmount = value ? parseInt(value, 10) / 100 : 0;
@@ -805,35 +816,20 @@
                 });
             });
 
-            async function submitToWebhook(data) {
-                const webhookUrl = 'https://hook.us1.make.com/8bt556rvouc1aigqvjrcalmergdy1498';
-                try {
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data),
-                    });
-                    return response.ok;
-                } catch (error) {
-                    console.error('Erro ao enviar para o webhook:', error);
-                    return false;
-                }
-            }
-
-            elements.buttons.step2.addEventListener('click', () => {
+            // NOVA LÓGICA DE CONVERSÃO NO BOTÃO DA ETAPA 2
+            elements.buttons.step2.addEventListener('click', async () => {
                 inputsToValidateStep2.forEach(item => validateAndStyleInput(item.el, item.fn));
                 validateStep2(); 
 
-                if (!elements.buttons.step2.disabled) showStep(3);
-                else {
+                if (elements.buttons.step2.disabled) {
                     const firstInvalid = elements.step2.registrationForm.querySelector('.is-invalid, :invalid'); 
                     firstInvalid?.focus();
+                    return;
                 }
-            });
-
-            elements.buttons.step3.addEventListener('click', async () => {
-                const btn = elements.buttons.step3;
+                
+                const btn = elements.buttons.step2;
                 const btnText = btn.querySelector('.button-text');
+                const originalText = btnText.textContent;
 
                 btn.classList.add('loading');
                 btn.disabled = true;
@@ -861,16 +857,18 @@
                         }
                     }
                 };
-
+                
+                console.log("Enviando payload para o webhook:", payload);
                 const success = await submitToWebhook(payload);
                 
-                btn.classList.remove('loading');
-
                 if (success) {
-                    btnText.textContent = 'Proposta Solicitada!';
+                    showStep(3);
                 } else {
-                    btnText.textContent = 'Erro! Tente Novamente';
+                    btn.classList.remove('loading');
+                    btnText.textContent = 'Erro no envio! Tente novamente.';
                     btn.disabled = false;
+                    // Opcional: reverter o texto do botão após um tempo
+                    setTimeout(() => { btnText.textContent = originalText; }, 3000);
                 }
             });
 
