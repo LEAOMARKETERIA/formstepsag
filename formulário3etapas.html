@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais III</title>
+    <title>Simulador de Antecipação - Versão Final Corrigida</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -284,6 +284,16 @@
             align-items: center; 
             gap: 0.5em; 
         }
+        
+        .checkbox-option a { 
+            color: var(--primary-highlight); 
+            text-decoration: underline; 
+            font-weight: 600; 
+        } 
+        .checkbox-option a:hover { 
+            color: var(--primary-highlight-darker); 
+        }
+        
 
         .result-container {
             background: var(--background-input-area); padding: 36px; border-radius: 20px; margin-bottom: 40px;
@@ -344,19 +354,17 @@
             .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
         }
 
-        /* Foco para inputs de texto e botões principais usa --primary-highlight */
         :focus-visible { 
             outline: 3px solid var(--primary-highlight); 
             outline-offset: 3px; 
         }
-        /* Foco para maturity-option, radio-option, checkbox-option usa --primary-dark */
+        
         .maturity-option:focus-visible, 
         .radio-option:focus-visible, 
         .checkbox-option:focus-visible { 
             position: relative; z-index: 10; 
-            /* Usar box-shadow aqui para não afetar o layout com outline, e usar cor escura */
             box-shadow: 0 0 0 2px var(--background-container), 0 0 0 4px var(--primary-dark) !important; 
-            outline: none; /* Remove o outline padrão para dar prioridade ao box-shadow */
+            outline: none; 
         }
         :focus:not(:focus-visible) { outline: none; }
         
@@ -492,11 +500,16 @@
                     <div class="checkbox-group">
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a Política de Privacidade.</label>
+                            <label for="consent-1" class="checkbox-label">Concordo em fornecer meus dados para receber o contato da AG Antecipa</label>
                         </div>
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a Autorização SCR, permitindo a consulta das minhas informações conforme descrito.</label>
+                            <label for="consent-2" class="checkbox-label">
+                                Declaro ter lido e aceito a 
+                                <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, 
+                                autorizando a consulta de minhas informações conforme descrito no documento 
+                                <a href="#" target="_blank" rel="noopener noreferrer">Política de autorização</a>.
+                            </label>
                         </div>
                     </div>
                 </fieldset>
@@ -525,7 +538,7 @@
             </div>
              <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
             <div class="button-container">
-                <button class="button" id="step3-button"><span class="button-text">Solicitar Proposta Oficial</span></button>
+                <button class="button" id="step3-button"><span class="button-text">Quero antecipar meus recebíveis</span></button>
             </div>
         </div>
     </div>
@@ -622,17 +635,15 @@
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; // Usar 0 se nada selecionado
+                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : baseRate;
 
-                // 'baseRate' global é atualizada pelo listener do radio. Usamos 'currentSelectedRateValue' para a lógica de habilitação aqui.
                 if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
                     
                     const termInMonths = selectedDays / 30;
-                    // Usar a variável global 'baseRate' para o cálculo, pois ela foi atualizada pelo evento 'change'.
-                    if ((1 + baseRate) > 0) { 
-                        let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
-                        simulationData.calculatedFinalAmount = discountedValue - 1; 
+                    if ((1 + currentSelectedRateValue) > 0) { 
+                        let discountedValue = enteredAmount / Math.pow((1 + currentSelectedRateValue), termInMonths);
+                        simulationData.calculatedFinalAmount = discountedValue; // CORRIGIDO: Removido o "- 1"
                     } else {
                         simulationData.calculatedFinalAmount = 0; 
                     }
@@ -722,14 +733,11 @@
             inputsToValidateStep2.forEach(item => {
                 if(item.el) { 
                     item.el.addEventListener('blur', () => validateAndStyleInput(item.el, item.fn));
-                     // Adicionar validação no input também para feedback mais rápido, se desejado
                     item.el.addEventListener('input', () => {
-                        // Para não validar agressivamente em cada tecla, pode-se adicionar um debounce
-                        // ou validar apenas se o campo já foi marcado como inválido anteriormente.
                         if (item.el.classList.contains('is-invalid')) {
                             validateAndStyleInput(item.el, item.fn);
                         }
-                         validateStep2(); // Revalida o botão de avançar a cada input
+                         validateStep2(); 
                     });
                 }
             });
@@ -793,7 +801,7 @@
                         }
                     };
                     console.log('Dados Finais da Solicitação:', formData);
-                    // alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)'); // REMOVIDO
+                    // alert removido
                 }, 2500);
             });
 
