@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Funil Otimizado</title>
+    <title>Simulador de Antecipação - Versão Final Corrigida</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -553,7 +553,7 @@
                 </div>
             </div>
              <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
-            </div>
+        </div>
     </div>
 
     <script>
@@ -562,7 +562,7 @@
                 progressFilled: document.getElementById('progress-filled'),
                 stepIndicators: {1: document.getElementById('step1-indicator'), 2: document.getElementById('step2-indicator'), 3: document.getElementById('step3-indicator')},
                 stepContainers: {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3')},
-                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button')}, // Botão 3 removido
+                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button')},
                 step1: {
                     amountInput: document.getElementById('amount-input'), 
                     maturityOptions: document.querySelectorAll('.maturity-option'),
@@ -784,14 +784,18 @@
 
                 wrapper.addEventListener('click', (e) => {
                     if (e.target.closest('a')) {
+                        return; // Deixa o link funcionar normalmente
+                    }
+
+                    // Se o clique for no próprio input, deixa o navegador agir
+                    if (e.target === input) {
                         return;
                     }
-                    e.preventDefault();
 
+                    // Para cliques no label ou na área em volta
+                    e.preventDefault();
                     if (input.type === 'radio') {
-                        if (!input.checked) {
-                            input.checked = true;
-                        }
+                        input.checked = true;
                     } else {
                         input.checked = !input.checked;
                     }
@@ -816,7 +820,6 @@
                 });
             });
 
-            // NOVA LÓGICA DE CONVERSÃO NO BOTÃO DA ETAPA 2
             elements.buttons.step2.addEventListener('click', async () => {
                 inputsToValidateStep2.forEach(item => validateAndStyleInput(item.el, item.fn));
                 validateStep2(); 
@@ -839,10 +842,7 @@
 
                 const payload = {
                     submissionTimestamp: new Date().toISOString(),
-                    simulation: {
-                        ...simulationData,
-                        rateUsed: baseRate
-                    },
+                    simulation: { ...simulationData, rateUsed: baseRate },
                     registration: {
                         email: elements.step2.emailInput.value,
                         name: elements.step2.nameInput.value,
@@ -858,7 +858,6 @@
                     }
                 };
                 
-                console.log("Enviando payload para o webhook:", payload);
                 const success = await submitToWebhook(payload);
                 
                 if (success) {
@@ -867,8 +866,11 @@
                     btn.classList.remove('loading');
                     btnText.textContent = 'Erro no envio! Tente novamente.';
                     btn.disabled = false;
-                    // Opcional: reverter o texto do botão após um tempo
-                    setTimeout(() => { btnText.textContent = originalText; }, 3000);
+                    setTimeout(() => { 
+                        if(btn.querySelector('.button-text')) { // Garante que o botão ainda existe
+                           btn.querySelector('.button-text').textContent = originalText;
+                        }
+                    }, 3000);
                 }
             });
 
