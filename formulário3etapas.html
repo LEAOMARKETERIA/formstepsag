@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Final com Layout Corrigido</title>
+    <title>Simulador de Antecipação - Versão Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -287,7 +287,6 @@
              border-color: var(--primary-dark); 
         }
        
-        /* *** CORREÇÃO DE LAYOUT DO TEXTO *** */
         .radio-option label.radio-label, 
         .checkbox-option label.checkbox-label { 
             font-weight: 500; 
@@ -296,8 +295,6 @@
             flex-grow: 1; 
             font-size: 16px; 
             line-height: 1.5;
-            /* As propriedades 'display: inline-flex', 'align-items' e 'gap' foram removidas
-               para permitir que o texto flua naturalmente como um parágrafo. */
         }
 
         .checkbox-label a {
@@ -519,7 +516,9 @@
                         
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a Política de Privacidade.</label>
+                            <label for="consent-1" class="checkbox-label">
+                                Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="https://agantecipa.com.br/lei-geral-de-protecao-de-dados/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.
+                            </label>
                         </div>
                         
                         <div class="checkbox-option" tabindex="0">
