@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Final Corrigida</title>
+    <title>Simulador de Antecipação - com GTM</title>
+    
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WQS4NGF');</script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -368,12 +374,10 @@
             .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
         }
 
-        /* Foco para inputs de texto e botões principais usa --primary-highlight */
         :focus-visible { 
             outline: 3px solid var(--primary-highlight); 
             outline-offset: 3px; 
         }
-        /* Foco para maturity-option, radio-option, checkbox-option usa --primary-dark */
         .maturity-option:focus-visible, 
         .radio-option:focus-visible, 
         .checkbox-option:focus-visible { 
@@ -387,6 +391,8 @@
     </style>
 </head>
 <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQS4NGF"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container">
         <div class="progress-bar">
             <div class="progress-step active" id="step1-indicator"><span class="step-number">1</span></div>
@@ -784,15 +790,11 @@
 
                 wrapper.addEventListener('click', (e) => {
                     if (e.target.closest('a')) {
-                        return; // Deixa o link funcionar normalmente
+                        return;
                     }
-
-                    // Se o clique for no próprio input, deixa o navegador agir
                     if (e.target === input) {
                         return;
                     }
-
-                    // Para cliques no label ou na área em volta
                     e.preventDefault();
                     if (input.type === 'radio') {
                         input.checked = true;
@@ -810,7 +812,6 @@
                         return;
                     }
                     e.preventDefault();
-
                     if (input.type === 'radio') {
                         input.checked = true;
                     } else {
@@ -861,13 +862,20 @@
                 const success = await submitToWebhook(payload);
                 
                 if (success) {
+                    window.dataLayer.push({
+                        'event': 'form_submission_success',
+                        'form_name': 'simulador_antecipacao',
+                        'valorSimulado': payload.simulation.enteredAmount,
+                        'prazoDias': payload.simulation.selectedDays
+                    });
+                    
                     showStep(3);
                 } else {
                     btn.classList.remove('loading');
                     btnText.textContent = 'Erro no envio! Tente novamente.';
                     btn.disabled = false;
                     setTimeout(() => { 
-                        if(btn.querySelector('.button-text')) { // Garante que o botão ainda existe
+                        if(btn.querySelector('.button-text')) {
                            btn.querySelector('.button-text').textContent = originalText;
                         }
                     }, 3000);
