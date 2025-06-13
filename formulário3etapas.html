@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Final</title>
+    <title>Simulador de Antecipação - com Webhook</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -618,7 +618,7 @@
                 currentStep = stepNumber;
                 updateProgressBar();
                
-                const firstFocusableElement = targetStepContainer.querySelector(
+                const firstFocusableElement = targetStepContainer?.querySelector(
                     'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), .maturity-option[tabindex="0"], .radio-option[tabindex="0"], .checkbox-option[tabindex="0"], button:not(:disabled)'
                 );
                 if (firstFocusableElement) {
@@ -805,6 +805,20 @@
                 });
             });
 
+            async function submitToWebhook(data) {
+                const webhookUrl = 'https://hook.us1.make.com/8bt556rvouc1aigqvjrcalmergdy1498';
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                    });
+                    return response.ok;
+                } catch (error) {
+                    console.error('Erro ao enviar para o webhook:', error);
+                    return false;
+                }
+            }
 
             elements.buttons.step2.addEventListener('click', () => {
                 inputsToValidateStep2.forEach(item => validateAndStyleInput(item.el, item.fn));
@@ -817,24 +831,47 @@
                 }
             });
 
-            elements.buttons.step3.addEventListener('click', () => {
+            elements.buttons.step3.addEventListener('click', async () => {
                 const btn = elements.buttons.step3;
-                btn.classList.add('loading'); btn.disabled = true;
-                setTimeout(() => {
-                    btn.classList.remove('loading'); btn.disabled = false;
-                    const formData = {
-                        simulation: {...simulationData, rateUsed: baseRate},
-                        registration: {
-                            email: elements.step2.emailInput.value, name: elements.step2.nameInput.value,
-                            phone: elements.step2.phoneInput.value, companyName: elements.step2.companyNameInput.value,
-                            cnpj: elements.step2.cnpjInput.value,
-                            yearsOperation: document.querySelector('input[name="years-operation"]:checked')?.value,
-                            monthlyRevenue: document.querySelector('input[name="monthly-revenue"]:checked')?.value,
-                            consents: {dataProcessing: elements.step2.consentCheckboxes[0].checked, scrAuthorization: elements.step2.consentCheckboxes[1].checked}
+                const btnText = btn.querySelector('.button-text');
+
+                btn.classList.add('loading');
+                btn.disabled = true;
+
+                const yearsLabel = document.querySelector('input[name="years-operation"]:checked')?.nextElementSibling.textContent;
+                const revenueLabel = document.querySelector('input[name="monthly-revenue"]:checked')?.nextElementSibling.textContent;
+
+                const payload = {
+                    submissionTimestamp: new Date().toISOString(),
+                    simulation: {
+                        ...simulationData,
+                        rateUsed: baseRate
+                    },
+                    registration: {
+                        email: elements.step2.emailInput.value,
+                        name: elements.step2.nameInput.value,
+                        phone: elements.step2.phoneInput.value,
+                        companyName: elements.step2.companyNameInput.value,
+                        cnpj: elements.step2.cnpjInput.value,
+                        yearsOperation: yearsLabel || 'Não informado',
+                        monthlyRevenue: revenueLabel || 'Não informado',
+                        consents: {
+                            dataProcessing: elements.step2.consentCheckboxes[0].checked,
+                            scrAuthorization: elements.step2.consentCheckboxes[1].checked
                         }
-                    };
-                    console.log('Dados Finais da Solicitação:', formData);
-                }, 2500);
+                    }
+                };
+
+                const success = await submitToWebhook(payload);
+                
+                btn.classList.remove('loading');
+
+                if (success) {
+                    btnText.textContent = 'Proposta Solicitada!';
+                } else {
+                    btnText.textContent = 'Erro! Tente Novamente';
+                    btn.disabled = false;
+                }
             });
 
             // Inicialização
