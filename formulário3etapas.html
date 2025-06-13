@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Corrigida e Funcional</title>
+    <title>Simulador de Antecipação - Versão Final com Layout Corrigido</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -287,13 +287,17 @@
              border-color: var(--primary-dark); 
         }
        
+        /* *** CORREÇÃO DE LAYOUT DO TEXTO *** */
         .radio-option label.radio-label, 
         .checkbox-option label.checkbox-label { 
-            font-weight: 500; cursor: pointer; color: var(--text-primary); 
-            flex-grow: 1; font-size: 16px; line-height: 1.5;
-            display: inline-flex; 
-            align-items: center; 
-            gap: 0.5em; 
+            font-weight: 500; 
+            cursor: pointer; 
+            color: var(--text-primary); 
+            flex-grow: 1; 
+            font-size: 16px; 
+            line-height: 1.5;
+            /* As propriedades 'display: inline-flex', 'align-items' e 'gap' foram removidas
+               para permitir que o texto flua naturalmente como um parágrafo. */
         }
 
         .checkbox-label a {
@@ -764,60 +768,43 @@
                 input.addEventListener('change', validateStep2);
             });
            
-            // ===================================================================
-            // INÍCIO DO BLOCO DE CÓDIGO JAVASCRIPT CORRIGIDO
-            // ===================================================================
             document.querySelectorAll('.radio-option, .checkbox-option').forEach(wrapper => {
                 const input = wrapper.querySelector('input[type="radio"], input[type="checkbox"]');
-                if (!input) return; // Se não houver input, pula para o próximo
+                if (!input) return;
 
-                // Lógica de Clique
                 wrapper.addEventListener('click', (e) => {
-                    // Se o clique foi em um link, não fazemos nada. Deixamos o navegador agir.
                     if (e.target.closest('a')) {
                         return;
                     }
-                    
-                    // Previne a ação padrão para evitar o clique duplo no label
                     e.preventDefault();
 
-                    // Alterna o estado do input
                     if (input.type === 'radio') {
                         if (!input.checked) {
                             input.checked = true;
                         }
-                    } else { // Checkbox
+                    } else {
                         input.checked = !input.checked;
                     }
-
-                    // Dispara o evento 'change' para que a validação do formulário seja executada
                     input.dispatchEvent(new Event('change', { bubbles: true }));
                 });
 
-                // Lógica de Teclado (Enter/Espaço)
                 wrapper.addEventListener('keydown', (e) => {
                     if (e.key !== 'Enter' && e.key !== ' ') {
                         return;
                     }
-
-                    // Se o foco estiver em um link, deixa o navegador agir
                     if (document.activeElement.tagName === 'A') {
                         return;
                     }
-                    
-                    e.preventDefault(); // Previne rolagem da página ao usar Espaço
+                    e.preventDefault();
 
                     if (input.type === 'radio') {
                         input.checked = true;
-                    } else { // Checkbox
+                    } else {
                         input.checked = !input.checked;
                     }
                     input.dispatchEvent(new Event('change', { bubbles: true }));
                 });
             });
-            // ===================================================================
-            // FIM DO BLOCO DE CÓDIGO JAVASCRIPT CORRIGIDO
-            // ===================================================================
 
 
             elements.buttons.step2.addEventListener('click', () => {
