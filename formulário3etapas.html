@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Ajustes Finais IV</title>
+    <title>Simulador de Antecipação - Ajustes Finais V</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -248,16 +248,22 @@
         .button:disabled::before { display: none; }
 
         .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+        
+        /* ALTERAÇÃO CSS: Estilo das opções para um visual mais limpo, sem caixas */
         .radio-option, .checkbox-option {
-            display: flex; align-items: center; 
-            padding: 16px; border-radius: 14px; cursor: pointer;
-            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-            background-color: var(--background-input-area); border: 2px solid transparent;
+            display: flex; 
+            align-items: center; 
+            padding: 8px 0; /* Ajuste no padding para manter o espaçamento vertical */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            background-color: transparent; /* Remove o fundo */
+            border: 2px solid transparent; /* Garante que o espaço da borda não cause 'pulos' no layout */
         }
         .radio-option:hover, .checkbox-option:hover {
-            background-color: var(--background-option-hover);
-            border-color: var(--border-dark); 
+            background-color: var(--background-input-area); /* Efeito de hover mais sutil */
+            border-radius: 8px;
         }
+
         .radio-option input[type="radio"], .checkbox-option input[type="checkbox"] {
             width: 20px; height: 20px; margin-right: 14px; 
             accent-color: var(--primary-dark); 
@@ -498,10 +504,12 @@
                 <fieldset class="input-group" aria-labelledby="consent-label">
                     <legend id="consent-label" class="input-group-legend">Consentimentos Obrigatórios*</legend>
                     <div class="checkbox-group">
+                        
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="https://agantecipa.com.br/politica-de-privacidade/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</label>
+                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a Política de Privacidade.</label>
                         </div>
+                        
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
                             <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.</label>
@@ -533,6 +541,7 @@
             </div>
              <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
             <div class="button-container">
+                
                 <button class="button" id="step3-button"><span class="button-text">Quero antecipar meus recebíveis</span></button>
             </div>
         </div>
