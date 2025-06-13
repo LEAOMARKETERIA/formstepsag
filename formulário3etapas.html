@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - Versão Final Corrigida</title>
+    <title>Simulador de Antecipação - Ajustes Finais IV</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,7 +16,7 @@
             --text-light: #f8fafc;
             --text-primary: #001A3B;
             --text-secondary: #52657d;
-            
+           
             --border-light: #e2e8f0;
             --border-medium: #cbd5e1; 
             --border-dark: #a0aec0; 
@@ -25,7 +25,7 @@
             --background-container: #ffffff; 
             --background-input-area: #f8faff; 
             --background-option-hover: #e9e9e9; 
-            
+           
             --warning-bg: linear-gradient(135deg, #fffaf0 0%, #fff3e0 100%);
             --warning-border: #fab363;
             --warning-text: #b55900;
@@ -142,7 +142,7 @@
             background: var(--background-container); font-weight: 500;
         }
         .input-group input::placeholder { color: var(--text-secondary); opacity: 0.7; }
-        
+       
         .input-group input[type="text"]:focus, 
         .input-group input[type="email"]:focus, 
         .input-group input[type="tel"]:focus, 
@@ -158,7 +158,7 @@
         .input-group select:hover:not(:focus):not(.is-valid):not(.is-invalid) { 
             border-color: var(--border-dark); 
         }
-        
+       
         .input-group input.is-valid { border-color: var(--success-color); }
         .input-group input.is-valid:focus {
             border-color: var(--success-color);
@@ -184,7 +184,7 @@
             margin-bottom: 14px; color: var(--primary-dark); font-weight: 600; 
             font-size: 17px; display: block; 
         }
-        
+       
         .value-field-wrapper { 
             display: flex;
             align-items: baseline; 
@@ -219,7 +219,7 @@
             outline: none; 
         }
         .value-input input::placeholder { color: var(--border-medium); }
-        
+       
 
         .alert-box {
             background: var(--warning-bg); border-radius: 16px; padding: 20px 22px; 
@@ -275,7 +275,7 @@
         .radio-option input[type="radio"]:checked, .checkbox-option input[type="checkbox"]:checked {
              border-color: var(--primary-dark); 
         }
-        
+       
         .radio-option label.radio-label, 
         .checkbox-option label.checkbox-label { 
             font-weight: 500; cursor: pointer; color: var(--text-primary); 
@@ -284,16 +284,14 @@
             align-items: center; 
             gap: 0.5em; 
         }
-        
-        .checkbox-option a { 
-            color: var(--primary-highlight); 
-            text-decoration: underline; 
-            font-weight: 600; 
-        } 
-        .checkbox-option a:hover { 
-            color: var(--primary-highlight-darker); 
+        .checkbox-label a {
+            color: var(--primary-highlight);
+            font-weight: 600;
+            text-decoration: none;
         }
-        
+        .checkbox-label a:hover {
+            text-decoration: underline;
+        }
 
         .result-container {
             background: var(--background-input-area); padding: 36px; border-radius: 20px; margin-bottom: 40px;
@@ -354,20 +352,22 @@
             .input-group input[type="text"], .input-group input[type="email"], .input-group input[type="tel"], .input-group select { padding: 14px 16px; }
         }
 
+        /* Foco para inputs de texto e botões principais usa --primary-highlight */
         :focus-visible { 
             outline: 3px solid var(--primary-highlight); 
             outline-offset: 3px; 
         }
-        
+        /* Foco para maturity-option, radio-option, checkbox-option usa --primary-dark */
         .maturity-option:focus-visible, 
         .radio-option:focus-visible, 
         .checkbox-option:focus-visible { 
             position: relative; z-index: 10; 
+            /* Usar box-shadow aqui para não afetar o layout com outline, e usar cor escura */
             box-shadow: 0 0 0 2px var(--background-container), 0 0 0 4px var(--primary-dark) !important; 
-            outline: none; 
+            outline: none; /* Remove o outline padrão para dar prioridade ao box-shadow */
         }
         :focus:not(:focus-visible) { outline: none; }
-        
+       
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
     </style>
 </head>
@@ -384,7 +384,7 @@
         <div class="step-container active" id="step1">
             <h1>Simule sua Antecipação</h1>
             <p class="step-instruction">Siga os passos abaixo para simular sua antecipação:</p>
-            
+           
             <div class="input-group">
                 <label for="maturity-options-id" class="input-group-legend">1- Prazo de vencimento (dias):</label>
                 <div class="maturity-options" id="maturity-options-id" role="group" aria-labelledby="maturity-options-id">
@@ -470,15 +470,15 @@
                 <fieldset class="input-group" aria-labelledby="years-operation-label">
                     <legend id="years-operation-label" class="input-group-legend">Há quantos anos sua empresa está em operação?*</legend>
                      <div class="radio-group">
-                        <div class="radio-option" tabindex="0">
-                            <input type="radio" id="years-less-2" name="years-operation" value="menos-2" required>
-                            <label for="years-less-2" class="radio-label">Menos de 2 anos</label>
-                        </div>
-                        <div class="radio-option" tabindex="0">
-                            <input type="radio" id="years-more-2" name="years-operation" value="mais-2" required>
-                            <label for="years-more-2" class="radio-label">Mais de 2 anos</label>
-                        </div>
-                    </div>
+                         <div class="radio-option" tabindex="0">
+                             <input type="radio" id="years-less-2" name="years-operation" value="menos-2" required>
+                             <label for="years-less-2" class="radio-label">Menos de 2 anos</label>
+                         </div>
+                         <div class="radio-option" tabindex="0">
+                             <input type="radio" id="years-more-2" name="years-operation" value="mais-2" required>
+                             <label for="years-more-2" class="radio-label">Mais de 2 anos</label>
+                         </div>
+                     </div>
                 </fieldset>
 
                 <fieldset class="input-group" aria-labelledby="monthly-revenue-label">
@@ -494,22 +494,17 @@
                         </div>
                     </div>
                 </fieldset>
-                
+               
                 <fieldset class="input-group" aria-labelledby="consent-label">
                     <legend id="consent-label" class="input-group-legend">Consentimentos Obrigatórios*</legend>
                     <div class="checkbox-group">
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">Concordo em fornecer meus dados para receber o contato da AG Antecipa</label>
+                            <label for="consent-1" class="checkbox-label">Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="https://agantecipa.com.br/politica-de-privacidade/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</label>
                         </div>
                         <div class="checkbox-option" tabindex="0">
                             <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">
-                                Declaro ter lido e aceito a 
-                                <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, 
-                                autorizando a consulta de minhas informações conforme descrito no documento 
-                                <a href="#" target="_blank" rel="noopener noreferrer">Política de autorização</a>.
-                            </label>
+                            <label for="consent-2" class="checkbox-label">Declaro ter lido e aceito a <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.</label>
                         </div>
                     </div>
                 </fieldset>
@@ -598,7 +593,7 @@
                 targetStepContainer.classList.add('active');
                 currentStep = stepNumber;
                 updateProgressBar();
-                
+               
                 const firstFocusableElement = targetStepContainer.querySelector(
                     'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), .maturity-option[tabindex="0"], .radio-option[tabindex="0"], .checkbox-option[tabindex="0"], button:not(:disabled)'
                 );
@@ -608,7 +603,7 @@
                      targetStepContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
-            
+           
             function applyPhoneMask(e) {
                 let value = e.target.value.replace(/\D/g, '');
                 value = value.substring(0, 11);
@@ -635,15 +630,17 @@
             function validateStep1() {
                 const { selectedDays, enteredAmount } = simulationData;
                 const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : baseRate;
+                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; // Usar 0 se nada selecionado
 
+                // 'baseRate' global é atualizada pelo listener do radio. Usamos 'currentSelectedRateValue' para a lógica de habilitação aqui.
                 if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
                     elements.buttons.step1.disabled = false;
-                    
+                   
                     const termInMonths = selectedDays / 30;
-                    if ((1 + currentSelectedRateValue) > 0) { 
-                        let discountedValue = enteredAmount / Math.pow((1 + currentSelectedRateValue), termInMonths);
-                        simulationData.calculatedFinalAmount = discountedValue; // CORRIGIDO: Removido o "- 1"
+                    // Usar a variável global 'baseRate' para o cálculo, pois ela foi atualizada pelo evento 'change'.
+                    if ((1 + baseRate) > 0) { 
+                        let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
+                        simulationData.calculatedFinalAmount = discountedValue - 1; 
                     } else {
                         simulationData.calculatedFinalAmount = 0; 
                     }
@@ -721,7 +718,7 @@
                     showStep(2);
                 }
             });
-            
+           
             const inputsToValidateStep2 = [
                 {el: elements.step2.emailInput, fn: val => elements.step2.emailInput.checkValidity() && val.trim() !== ''},
                 {el: elements.step2.nameInput, fn: val => val.trim().length >= 3},
@@ -733,11 +730,14 @@
             inputsToValidateStep2.forEach(item => {
                 if(item.el) { 
                     item.el.addEventListener('blur', () => validateAndStyleInput(item.el, item.fn));
+                     // Adicionar validação no input também para feedback mais rápido, se desejado
                     item.el.addEventListener('input', () => {
+                        // Para não validar agressivamente em cada tecla, pode-se adicionar um debounce
+                        // ou validar apenas se o campo já foi marcado como inválido anteriormente.
                         if (item.el.classList.contains('is-invalid')) {
                             validateAndStyleInput(item.el, item.fn);
                         }
-                         validateStep2(); 
+                         validateStep2(); // Revalida o botão de avançar a cada input
                     });
                 }
             });
@@ -747,7 +747,7 @@
             [...elements.step2.yearsOperationRadios, ...elements.step2.monthlyRevenueRadios, ...elements.step2.consentCheckboxes].forEach(input => {
                 input.addEventListener('change', validateStep2);
             });
-            
+           
             document.querySelectorAll('.radio-option, .checkbox-option').forEach(wrapper => {
                 wrapper.addEventListener('click', (e) => {
                     const input = wrapper.querySelector('input[type="radio"], input[type="checkbox"]');
@@ -801,7 +801,7 @@
                         }
                     };
                     console.log('Dados Finais da Solicitação:', formData);
-                    // alert removido
+                    // alert('Proposta Oficial Solicitada com Sucesso! (Verifique o console para os dados)'); // REMOVIDO
                 }, 2500);
             });
 
