@@ -12,11 +12,21 @@
     })(window,document,'script','dataLayer','GTM-WQS4NGF');</script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        <!-- Configuração adicional para servidor -->
+ <!-- DEBUG - Substitua temporariamente -->
 <script>
+console.log('Script carregado!');
+
 window.addEventListener('load', function() {
+  console.log('Load event disparado!');
+  
   setTimeout(function() {
+    console.log('setTimeout executado!');
+    console.log('gtag disponível?', typeof gtag);
+    console.log('dataLayer:', window.dataLayer);
+    
     if (typeof gtag !== 'undefined') {
+      console.log('Configurando GA4...');
+      
       gtag('config', 'G-H3031FC8LR', {
         'transport_url': 'https://gtm.agantecipa.com.br/g/collect',
         'cookie_domain': 'none',
@@ -25,9 +35,11 @@ window.addEventListener('load', function() {
         'restricted_data_processing': false
       });
       
-      console.log('GTM Server configuration loaded for iframe');
+      console.log('GA4 configurado!');
+    } else {
+      console.log('gtag não está disponível ainda!');
     }
-  }, 1500);
+  }, 3000); // Aumentei para 3 segundos
 });
 </script>
         :root {
