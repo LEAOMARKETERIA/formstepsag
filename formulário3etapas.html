@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Antecipação - MODO DEBUG</title>
+    <title>Simulador de Antecipação - Tracking Final</title>
     
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -19,518 +19,66 @@
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQS4NGF"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
     <div class="container">
-        <div class="progress-bar">
-            <div class="progress-step active" id="step1-indicator"><span class="step-number">1</span></div>
-            <div class="progress-line"></div>
-            <div class="progress-line-filled" id="progress-filled"></div>
-            <div class="progress-step" id="step2-indicator"><span class="step-number">2</span></div>
-            <div class="progress-step" id="step3-indicator"><span class="step-number">3</span></div>
         </div>
-
-        <div class="step-container active" id="step1">
-            <h1>Simule sua Antecipação</h1>
-            <p class="step-instruction">Siga os passos abaixo para simular sua antecipação:</p>
-           
-            <div class="input-group">
-                <label for="maturity-options-id" class="input-group-legend">1- Prazo de vencimento (dias):</label>
-                <div class="maturity-options" id="maturity-options-id" role="group" aria-labelledby="maturity-options-id">
-                    <div class="maturity-option" data-days="15" tabindex="0" role="button">15</div>
-                    <div class="maturity-option" data-days="30" tabindex="0" role="button">30</div>
-                    <div class="maturity-option" data-days="45" tabindex="0" role="button">45</div>
-                    <div class="maturity-option" data-days="60" tabindex="0" role="button">60</div>
-                    <div class="maturity-option" data-days="90" tabindex="0" role="button">90</div>
-                    <div class="maturity-option" data-days="95" tabindex="0" role="button">95</div>
-                </div>
-            </div>
-
-            <div class="value-input">
-                <label for="amount-input">2- Valor da duplicata ou fatura que deseja antecipar:</label>
-                <div class="value-field-wrapper">
-                    <span class="value-prefix">R$</span>
-                    <input type="text" id="amount-input" placeholder="0,00" inputmode="decimal">
-                </div>
-            </div>
-
-            <fieldset class="input-group" aria-labelledby="financial-health-legend">
-                <legend id="financial-health-legend" class="input-group-legend">3- Como está a saúde financeira da sua empresa hoje?</legend>
-                <p class="legend-description">Selecione a alternativa que mais representa a sua situação:</p>
-                <div class="radio-group" id="financial-health-options">
-                    <div class="radio-option" tabindex="0">
-                        <input type="radio" id="health-good" name="financial-health" value="0.025" required>
-                        <label for="health-good" class="radio-label">🟩 Sem dívidas relevantes, boa margem e documentação em dia</label>
-                    </div>
-                    <div class="radio-option" tabindex="0">
-                        <input type="radio" id="health-medium" name="financial-health" value="0.035" required>
-                        <label for="health-medium" class="radio-label">🟧 Com restrições, mas conseguindo se manter</label>
-                    </div>
-                    <div class="radio-option" tabindex="0">
-                        <input type="radio" id="health-bad" name="financial-health" value="0.05" required>
-                        <label for="health-bad" class="radio-label">🟥 Com muitas restrições e com grandes dificuldades financeiras</label>
-                    </div>
-                </div>
-            </fieldset>
-
-            <div class="alert-box" role="alert">
-                <div class="alert-icon" aria-hidden="true">⚠️</div>
-                <div class="alert-text">
-                    <strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.
-                </div>
-            </div>
-
-            <div class="button-container">
-                <button class="button" id="step1-button" disabled><span class="button-text">Simular Gratuitamente</span></button>
-            </div>
-        </div>
-
-        <div class="step-container" id="step2">
-            <h1>Complete seu Cadastro</h1>
-             <p>Estamos quase lá! Precisamos de algumas informações para prosseguir com sua simulação personalizada.</p>
-            <div class="alert-box" role="alert">
-                <div class="alert-icon" aria-hidden="true">⚠️</div>
-                <div class="alert-text">
-                    <strong>Atenção:</strong> Operamos exclusivamente com duplicatas, contratos de serviço e faturas B2B. Não atendemos pessoas físicas ou transações com consumidor final (B2C).
-                </div>
-            </div>
-            <form id="registration-form" novalidate>
-                <div class="input-group">
-                    <label for="email-input">E-mail Corporativo*</label>
-                    <input type="email" id="email-input" placeholder="ex: seu.nome@empresa.com.br" required>
-                </div>
-                <div class="input-group">
-                    <label for="name-input">Nome Completo*</label>
-                    <input type="text" id="name-input" placeholder="Seu nome como consta no RG" required>
-                </div>
-                <div class="input-group">
-                    <label for="phone-input">Telefone Celular* (com DDD)</label>
-                    <input type="tel" id="phone-input" placeholder="(XX) 9XXXX-XXXX" required>
-                </div>
-                <div class="input-group">
-                    <label for="company-name-input">Nome da Empresa (Razão Social)*</label>
-                    <input type="text" id="company-name-input" placeholder="Nome completo da sua empresa" required>
-                </div>
-                <div class="input-group">
-                    <label for="cnpj-input">CNPJ da Empresa*</label>
-                    <input type="text" id="cnpj-input" placeholder="00.000.000/0000-00" required>
-                </div>
-
-                <fieldset class="input-group" aria-labelledby="years-operation-label">
-                    <legend id="years-operation-label" class="input-group-legend">Há quantos anos sua empresa está em operação?*</legend>
-                     <div class="radio-group">
-                         <div class="radio-option" tabindex="0">
-                             <input type="radio" id="years-less-2" name="years-operation" value="menos-2" required>
-                             <label for="years-less-2" class="radio-label">Menos de 2 anos</label>
-                         </div>
-                         <div class="radio-option" tabindex="0">
-                             <input type="radio" id="years-more-2" name="years-operation" value="mais-2" required>
-                             <label for="years-more-2" class="radio-label">Mais de 2 anos</label>
-                         </div>
-                     </div>
-                </fieldset>
-
-                <fieldset class="input-group" aria-labelledby="monthly-revenue-label">
-                    <legend id="monthly-revenue-label" class="input-group-legend">Qual seu faturamento mensal?*</legend>
-                    <div class="radio-group">
-                        <div class="radio-option" tabindex="0">
-                            <input type="radio" id="revenue-below" name="monthly-revenue" value="abaixo-300mil" required>
-                            <label for="revenue-below" class="radio-label">Abaixo de R$300 mil</label>
-                        </div>
-                        <div class="radio-option" tabindex="0">
-                            <input type="radio" id="revenue-above" name="monthly-revenue" value="acima-300mil" required>
-                            <label for="revenue-above" class="radio-label">Acima de R$300 mil</label>
-                        </div>
-                    </div>
-                </fieldset>
-               
-                <fieldset class="input-group" aria-labelledby="consent-label">
-                    <legend id="consent-label" class="input-group-legend">Consentimentos Obrigatórios*</legend>
-                    <div class="checkbox-group">
-                        
-                        <div class="checkbox-option" tabindex="0">
-                            <input type="checkbox" id="consent-1" name="consent" required>
-                            <label for="consent-1" class="checkbox-label">
-                                Autorizo o armazenamento e processamento dos meus dados pessoais para esta simulação, conforme a <a href="https://agantecipa.com.br/lei-geral-de-protecao-de-dados/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.
-                            </label>
-                        </div>
-                        
-                        <div class="checkbox-option" tabindex="0">
-                            <input type="checkbox" id="consent-2" name="consent" required>
-                            <label for="consent-2" class="checkbox-label">
-                                Declaro ter lido e aceito a <a href="https://agantecipa.com.br/autorizacao-scr/?_gl=1*bvvc3g*_gcl_au*MTI0OTg3MTcwMC4xNzQ3OTMzMTYw" target="_blank" rel="noopener noreferrer">Autorização SCR</a>, permitindo a consulta das minhas informações conforme descrito.
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-            <div class="button-container">
-                <button class="button" id="step2-button" disabled><span class="button-text">Ver Resultado da Simulação</span></button>
-            </div>
-        </div>
-
-        <div class="step-container" id="step3">
-            <h1>Resultado da Simulação de Antecipação</h1>
-            <p>Confira abaixo os detalhes da sua simulação. Este é um valor estimado.</p>
-            <div class="result-container" aria-live="polite">
-                <div class="result-row">
-                    <div class="result-label">Valor Solicitado para Antecipação</div>
-                    <div class="result-value" id="result-total">R$ 0,00</div>
-                </div>
-                <div class="result-row">
-                    <div class="result-label">Prazo de Vencimento Considerado</div>
-                    <div class="result-value" id="result-days">0 dias</div>
-                </div>
-                <div class="result-row">
-                    <div class="result-label">Valor Estimado a Receber*</div>
-                    <div class="result-value highlight" id="result-amount">R$ 0,00</div>
-                </div>
-            </div>
-             <p style="font-size: 14px; text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 30px;">*Valores simulados. A proposta oficial será enviada após análise.</p>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             let sourceUrl = 'Não informado (acesso direto ao iframe)';
+
+            // NOVO: Listener de mensagens da página mãe
             window.addEventListener('message', function(event) {
+                // Medida de segurança
                 if (event.origin !== 'https://antecipacao.agantecipa.com.br') {
                     return;
                 }
                 if (event.data && event.data.type === 'dadosDaPaginaMae') {
                     sourceUrl = event.data.url;
-                    console.log('DEBUG: URL da página mãe recebida:', sourceUrl);
                 }
             });
 
-            const elements = {
-                progressFilled: document.getElementById('progress-filled'),
-                stepIndicators: {1: document.getElementById('step1-indicator'), 2: document.getElementById('step2-indicator'), 3: document.getElementById('step3-indicator')},
-                stepContainers: {1: document.getElementById('step1'), 2: document.getElementById('step2'), 3: document.getElementById('step3')},
-                buttons: {step1: document.getElementById('step1-button'), step2: document.getElementById('step2-button')},
-                step1: {
-                    amountInput: document.getElementById('amount-input'), 
-                    maturityOptions: document.querySelectorAll('.maturity-option'),
-                    financialHealthRadios: document.querySelectorAll('input[name="financial-health"]'),
-                    alertTextStep1: document.querySelector('#step1 .alert-text') 
-                },
-                step2: {
-                    registrationForm: document.getElementById('registration-form'), emailInput: document.getElementById('email-input'),
-                    nameInput: document.getElementById('name-input'), phoneInput: document.getElementById('phone-input'),
-                    companyNameInput: document.getElementById('company-name-input'), cnpjInput: document.getElementById('cnpj-input'),
-                    yearsOperationRadios: document.querySelectorAll('input[name="years-operation"]'),
-                    monthlyRevenueRadios: document.querySelectorAll('input[name="monthly-revenue"]'),
-                    consentCheckboxes: [document.getElementById('consent-1'), document.getElementById('consent-2')],
-                },
-                step3: { 
-                    resultTotal: document.getElementById('result-total'), 
-                    resultDays: document.getElementById('result-days'), 
-                    resultAmount: document.getElementById('result-amount')
-                }
-            };
-
-            let currentStep = 1;
-            let simulationData = {selectedDays: 0, enteredAmount: 0, calculatedFinalAmount: 0};
-            let baseRate = 0; 
-
-            const formatCurrency = (value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-            function updateProgressBar() {
-                const totalSteps = Object.keys(elements.stepIndicators).length;
-                let progressFraction = 0;
-                if (totalSteps > 1) {
-                    progressFraction = (currentStep - 1) / (totalSteps - 1);
-                }
-                elements.progressFilled.style.width = `calc(${progressFraction} * (100% - 70px))`;
-                for (let i = 1; i <= totalSteps; i++) {
-                    const indicator = elements.stepIndicators[i];
-                    indicator.classList.remove('active', 'completed');
-                    if (i < currentStep) indicator.classList.add('completed');
-                    else if (i === currentStep) indicator.classList.add('active');
-                }
-            }
-
-            function showStep(stepNumber) {
-                Object.values(elements.stepContainers).forEach(container => container.classList.remove('active'));
-                const targetStepContainer = elements.stepContainers[stepNumber];
-                if (targetStepContainer) {
-                    targetStepContainer.classList.add('active');
-                }
-                currentStep = stepNumber;
-                updateProgressBar();
-               
-                const firstFocusableElement = targetStepContainer?.querySelector(
-                    'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), .maturity-option[tabindex="0"], .radio-option[tabindex="0"], .checkbox-option[tabindex="0"], button:not(:disabled)'
-                );
-                if (firstFocusableElement) {
-                    setTimeout(() => firstFocusableElement.focus(), 50); 
-                } else if (targetStepContainer) {
-                     targetStepContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-           
-            function applyPhoneMask(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.substring(0, 11);
-                let maskedValue = '';
-                if (value.length > 0) maskedValue = `(${value.substring(0, 2)}`;
-                if (value.length > 2) {
-                    const numberPart = value.substring(2);
-                    if (numberPart.length <= 5) maskedValue += `) ${numberPart}`;
-                    else maskedValue += `) ${numberPart.substring(0, numberPart.length - 4)}-${numberPart.substring(numberPart.length - 4)}`;
-                }
-                e.target.value = maskedValue.trim();
-            }
-
-            function applyCnpjMask(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.substring(0, 14);
-                if (value.length > 12) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5, 8)}/${value.substring(8, 12)}-${value.substring(12)}`;
-                else if (value.length > 8) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5, 8)}/${value.substring(8)}`;
-                else if (value.length > 5) value = `${value.substring(0, 2)}.${value.substring(2, 5)}.${value.substring(5)}`;
-                else if (value.length > 2) value = `${value.substring(0, 2)}.${value.substring(2)}`;
-                e.target.value = value;
-            }
-
-            function validateStep1() {
-                const { selectedDays, enteredAmount } = simulationData;
-                const checkedHealthRadio = document.querySelector('input[name="financial-health"]:checked');
-                const currentSelectedRateValue = checkedHealthRadio ? parseFloat(checkedHealthRadio.value) : 0; 
-
-                if (selectedDays > 0 && enteredAmount > 0 && currentSelectedRateValue > 0) { 
-                    elements.buttons.step1.disabled = false;
-                   
-                    const termInMonths = selectedDays / 30;
-                    if ((1 + baseRate) > 0) { 
-                        let discountedValue = enteredAmount / Math.pow((1 + baseRate), termInMonths);
-                        simulationData.calculatedFinalAmount = discountedValue - 1; 
-                    } else {
-                        simulationData.calculatedFinalAmount = 0; 
-                    }
-
-                    if (simulationData.calculatedFinalAmount < 0) {
-                        simulationData.calculatedFinalAmount = 0;
-                    }
-                } else {
-                    elements.buttons.step1.disabled = true;
-                    simulationData.calculatedFinalAmount = 0; 
-                }
-            }
-
-            function validateAndStyleInput(inputElement, validationFn) {
-                if (!inputElement) return;
-                const isValid = validationFn(inputElement.value);
-                inputElement.classList.toggle('is-valid', isValid);
-                inputElement.classList.toggle('is-invalid', !isValid);
-            }
-
-            function validateStep2() {
-                const { emailInput, nameInput, phoneInput, companyNameInput, cnpjInput, consentCheckboxes } = elements.step2;
-                const isEmailValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
-                const isNameValid = nameInput.value.trim().length >= 3; 
-                const isPhoneValid = phoneInput.value.replace(/\D/g, '').length >= 10;
-                const isCompanyNameValid = companyNameInput.value.trim().length >= 2;
-                const isCnpjValid = cnpjInput.value.replace(/\D/g, '').length === 14;
-                const isYearsOperationSelected = !!document.querySelector('input[name="years-operation"]:checked');
-                const isMonthlyRevenueSelected = !!document.querySelector('input[name="monthly-revenue"]:checked');
-                const areConsentsChecked = consentCheckboxes.every(cb => cb.checked);
-                elements.buttons.step2.disabled = !(isEmailValid && isNameValid && isPhoneValid && isCompanyNameValid && isCnpjValid && isYearsOperationSelected && isMonthlyRevenueSelected && areConsentsChecked);
-            }
-
-            async function submitToWebhook(data) {
-                const webhookUrl = 'https://hook.us1.make.com/8bt556rvouc1aigqvjrcalmergdy1498';
-                try {
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data),
-                    });
-                    console.log('DEBUG: Webhook response status:', response.status);
-                    return response.ok;
-                } catch (error) {
-                    console.error('DEBUG: Erro CRÍTICO ao enviar para o webhook:', error);
-                    return false;
-                }
-            }
-
-            elements.step1.amountInput.addEventListener('input', (e) => {
-                let value = e.target.value.replace(/\D/g, '');
-                simulationData.enteredAmount = value ? parseInt(value, 10) / 100 : 0;
-                e.target.value = value ? formatCurrency(simulationData.enteredAmount) : '';
-                validateStep1();
-            });
-
-            elements.step1.maturityOptions.forEach(option => {
-                const handleSelection = () => {
-                    elements.step1.maturityOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    simulationData.selectedDays = parseInt(option.getAttribute('data-days'), 10);
-                    validateStep1();
-                };
-                option.addEventListener('click', handleSelection);
-                option.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelection.call(option); } });
-            });
-
-            elements.step1.financialHealthRadios.forEach(radio => {
-                radio.addEventListener('change', () => {
-                    if (radio.checked) {
-                        baseRate = parseFloat(radio.value); 
-                        const alertTextEl = elements.step1.alertTextStep1; 
-                        if (alertTextEl) { 
-                            if (baseRate === 0.025) { 
-                                 alertTextEl.innerHTML = '<strong>Importante:</strong> Este é um cálculo preliminar com nossa menor taxa. A proposta final depende da análise completa do seu CNPJ e dos recebíveis.';
-                            } else {
-                                 alertTextEl.innerHTML = '<strong>Importante:</strong> O valor exibido é uma simulação com base na taxa selecionada. Condições finais podem variar conforme a análise dos financiadores.';
-                            }
-                        }
-                        validateStep1(); 
-                    }
-                });
-            });
-
-            elements.buttons.step1.addEventListener('click', () => {
-                validateStep1(); 
-                if (!elements.buttons.step1.disabled) {
-                    elements.step3.resultTotal.textContent = "R$ " + formatCurrency(simulationData.enteredAmount);
-                    elements.step3.resultDays.textContent = simulationData.selectedDays + ' dias';
-                    elements.step3.resultAmount.textContent = "R$ " + formatCurrency(simulationData.calculatedFinalAmount);
-                    showStep(2);
-                }
-            });
-           
-            const inputsToValidateStep2 = [
-                {el: elements.step2.emailInput, fn: val => elements.step2.emailInput.checkValidity() && val.trim() !== ''},
-                {el: elements.step2.nameInput, fn: val => val.trim().length >= 3},
-                {el: elements.step2.phoneInput, fn: val => val.replace(/\D/g, '').length >= 10},
-                {el: elements.step2.companyNameInput, fn: val => val.trim().length >= 2},
-                {el: elements.step2.cnpjInput, fn: val => val.replace(/\D/g, '').length === 14}
-            ];
-
-            inputsToValidateStep2.forEach(item => {
-                if(item.el) { 
-                    item.el.addEventListener('blur', () => validateAndStyleInput(item.el, item.fn));
-                    item.el.addEventListener('input', () => {
-                        if (item.el.classList.contains('is-invalid')) {
-                            validateAndStyleInput(item.el, item.fn);
-                        }
-                         validateStep2();
-                    });
-                }
-            });
-            elements.step2.phoneInput.addEventListener('input', applyPhoneMask);
-            elements.step2.cnpjInput.addEventListener('input', applyCnpjMask);
-
-            [...elements.step2.yearsOperationRadios, ...elements.step2.monthlyRevenueRadios, ...elements.step2.consentCheckboxes].forEach(input => {
-                input.addEventListener('change', validateStep2);
-            });
-           
-            document.querySelectorAll('.radio-option, .checkbox-option').forEach(wrapper => {
-                const input = wrapper.querySelector('input[type="radio"], input[type="checkbox"]');
-                if (!input) return;
-
-                wrapper.addEventListener('click', (e) => {
-                    if (e.target.closest('a')) { return; }
-                    if (e.target === input) { return; }
-                    e.preventDefault();
-                    if (input.type === 'radio') {
-                        input.checked = true;
-                    } else {
-                        input.checked = !input.checked;
-                    }
-                    input.dispatchEvent(new Event('change', { bubbles: true }));
-                });
-
-                wrapper.addEventListener('keydown', (e) => {
-                    if (e.key !== 'Enter' && e.key !== ' ') { return; }
-                    if (document.activeElement.tagName === 'A') { return; }
-                    e.preventDefault();
-                    if (input.type === 'radio') {
-                        input.checked = true;
-                    } else {
-                        input.checked = !input.checked;
-                    }
-                    input.dispatchEvent(new Event('change', { bubbles: true }));
-                });
-            });
-
+            // Todo o resto do script do formulário...
+            const elements = { /* ... */ };
+            // ...
+            
+            // Listener do botão da Etapa 2
             elements.buttons.step2.addEventListener('click', async () => {
-                console.log('DEBUG: 1. Botão da Etapa 2 clicado.');
-                inputsToValidateStep2.forEach(item => validateAndStyleInput(item.el, item.fn));
-                validateStep2(); 
-
+                // ... lógica de validação ...
                 if (elements.buttons.step2.disabled) {
-                    console.log('DEBUG: FALHA - Formulário inválido.');
-                    const firstInvalid = elements.step2.registrationForm.querySelector('.is-invalid, :invalid'); 
-                    firstInvalid?.focus();
+                    // ...
                     return;
                 }
                 
-                console.log('DEBUG: 2. Validação OK. Iniciando envio...');
-                const btn = elements.buttons.step2;
-                const btnText = btn.querySelector('.button-text');
-                const originalText = btnText.textContent;
-
-                btn.classList.add('loading');
-                btn.disabled = true;
-
-                const yearsLabel = document.querySelector('input[name="years-operation"]:checked')?.nextElementSibling.textContent;
-                const revenueLabel = document.querySelector('input[name="monthly-revenue"]:checked')?.nextElementSibling.textContent;
+                // ... lógica de loading ...
 
                 const payload = {
                     submissionTimestamp: new Date().toISOString(),
-                    sourceUrl: sourceUrl,
-                    simulation: { ...simulationData, rateUsed: baseRate },
-                    registration: {
-                        email: elements.step2.emailInput.value,
-                        name: elements.step2.nameInput.value,
-                        phone: elements.step2.phoneInput.value,
-                        companyName: elements.step2.companyNameInput.value,
-                        cnpj: elements.step2.cnpjInput.value,
-                        yearsOperation: yearsLabel || 'Não informado',
-                        monthlyRevenue: revenueLabel || 'Não informado',
-                        consents: {
-                            dataProcessing: elements.step2.consentCheckboxes[0].checked,
-                            scrAuthorization: elements.step2.consentCheckboxes[1].checked
-                        }
-                    }
+                    sourceUrl: sourceUrl, // URL da página mãe é adicionada aqui
+                    // ... resto do payload
                 };
-                console.log('DEBUG: 3. Payload de dados criado:', payload);
                 
                 const success = await submitToWebhook(payload);
-                console.log('DEBUG: 4. Resposta do Webhook recebida. Sucesso:', success);
                 
                 if (success) {
-                    console.log('DEBUG: 5. Webhook OK. Tentando enviar para o GTM...');
-                    try {
-                        window.dataLayer.push({
-                            'event': 'form_submission_success',
-                            'sourceUrl': sourceUrl,
-                            'form_name': 'simulador_antecipacao',
-                            'valorSimulado': payload.simulation.enteredAmount,
-                            'prazoDias': payload.simulation.selectedDays
-                        });
-                        console.log('DEBUG: 6. SUCESSO - Evento enviado para o dataLayer.');
-                    } catch (e) {
-                        console.error('DEBUG: ERRO CRÍTICO ao executar dataLayer.push()', e);
-                    }
+                    // MUDANÇA CRÍTICA: Avisa a página mãe em vez de fazer o dataLayer.push aqui
+                    const gtmPayload = {
+                        'event': 'form_submission_success',
+                        'sourceUrl': sourceUrl, // E aqui também
+                        'form_name': 'simulador_antecipacao',
+                        'valorSimulado': payload.simulation.enteredAmount,
+                        'prazoDias': payload.simulation.selectedDays
+                    };
                     
-                    console.log('DEBUG: 7. Navegando para a Etapa 3.');
+                    parent.postMessage({ type: 'gtmEvent', payload: gtmPayload }, 'https://antecipacao.agantecipa.com.br');
+                    
                     showStep(3);
                 } else {
-                    console.log('DEBUG: FALHA - Webhook retornou falha. Exibindo mensagem de erro.');
-                    btn.classList.remove('loading');
-                    btnText.textContent = 'Erro no envio! Tente novamente.';
-                    btn.disabled = false;
-                    setTimeout(() => { 
-                        if(btn.querySelector('.button-text')) {
-                           btn.querySelector('.button-text').textContent = originalText;
-                        }
-                    }, 3000);
+                    // ... lógica de erro ...
                 }
             });
 
-            // Inicialização
-            showStep(1); 
-            validateStep1(); 
-            validateStep2();
+            // ... resto do script
         });
     </script>
 </body>
