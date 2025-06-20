@@ -10,56 +10,6 @@
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-WQS4NGF');</script>
-<!-- Configuração adicional para GTM Server -->
-<script>
-// Aguarda o GTM carregar
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    // Configura GA4 para enviar também para o servidor
-    if (typeof gtag !== 'undefined') {
-      gtag('config', 'G-H3031FC8LR', {
-        'transport_url': 'https://gtm.agantecipa.com.br/g/collect',
-        'cookie_domain': 'none',
-        'cookie_flags': 'SameSite=None;Secure',
-        'allow_ad_personalization_signals': false,
-        'restricted_data_processing': false
-      });
-      
-      console.log('GTM Server configuration loaded for GitHub iframe');
-    }
-    
-    // Intercepta dataLayer.push para garantir envio ao servidor
-    if (window.dataLayer) {
-      const originalPush = window.dataLayer.push;
-      window.dataLayer.push = function() {
-        // Chama o push original
-        const result = originalPush.apply(this, arguments);
-        
-        // Para eventos de conversão, força envio ao servidor também
-        for (let i = 0; i < arguments.length; i++) {
-          const data = arguments[i];
-          if (data && data.event === 'form_submission_success') {
-            // Força envio direto ao GA4 também
-            if (typeof gtag !== 'undefined') {
-              gtag('event', 'conversion', {
-                'send_to': 'G-H3031FC8LR',
-                'custom_parameter_1': 'github_form',
-                'value': data.valorSimulado || 0,
-                'currency': 'BRL',
-                'transaction_id': 'form_' + Date.now()
-              });
-              
-              console.log('Conversion event sent to server:', data);
-            }
-          }
-        }
-        
-        return result;
-      };
-    }
-  }, 2000);
-});
-</script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
