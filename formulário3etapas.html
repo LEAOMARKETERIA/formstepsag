@@ -12,6 +12,24 @@
     })(window,document,'script','dataLayer','GTM-WQS4NGF');</script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        <!-- Configuração adicional para servidor -->
+<script>
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if (typeof gtag !== 'undefined') {
+      gtag('config', 'G-H3031FC8LR', {
+        'transport_url': 'https://gtm.agantecipa.com.br/g/collect',
+        'cookie_domain': 'none',
+        'cookie_flags': 'SameSite=None;Secure',
+        'allow_ad_personalization_signals': false,
+        'restricted_data_processing': false
+      });
+      
+      console.log('GTM Server configuration loaded for iframe');
+    }
+  }, 1500);
+});
+</script>
         :root {
             --primary-dark: #001A3B;
             --primary-highlight: #DD2973; 
